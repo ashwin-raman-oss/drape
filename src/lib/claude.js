@@ -12,7 +12,7 @@ export async function callClaude(body) {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    throw new Error(err?.error?.message ?? `Claude API error: ${res.status}`)
+    throw new Error(err?.error?.message ?? err?.error ?? `Claude API error: ${res.status}`)
   }
   return res.json()
 }
