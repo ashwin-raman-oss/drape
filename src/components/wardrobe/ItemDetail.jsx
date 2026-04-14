@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useUpdateItem, useDeleteItem } from '../../hooks/useWardrobe'
 
 const FORMALITY_LABELS = { 1: 'Loungewear', 2: 'Casual', 3: 'Smart casual', 4: 'Business', 5: 'Formal' }
@@ -8,6 +8,30 @@ export default function ItemDetail({ item, onClose }) {
   const { mutateAsync: deleteItem, isPending: isDeleting } = useDeleteItem()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [error, setError] = useState(null)
+  const closeRef = useRef(null)
+  const deleteRef = useRef(null)
+
+  // Move focus into modal on mount; restore to opener on unmount
+  useEffect(() => {
+    const opener = document.activeElement
+    closeRef.current?.focus()
+    return () => { opener?.focus() }
+  }, [])
+
+  function handleKeyDown(e) {
+    if (e.key !== 'Tab') return
+    const focusable = [closeRef.current, deleteRef.current].filter(Boolean)
+    if (!focusable.length) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }
 
   async function handleArchive() {
     setError(null)
@@ -31,13 +55,31 @@ export default function ItemDetail({ item, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-bg/95 z-50 overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.item_type}
+      onKeyDown={handleKeyDown}
+      className="fixed inset-0 bg-bg/95 z-50 overflow-y-auto"
+    >
       <div className="max-w-md mx-auto px-6 pt-6 pb-10">
-        <button type="button" aria-label="Close" onClick={onClose} className="text-muted text-sm mb-6">✕ Close</button>
+        <button
+          ref={closeRef}
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="text-muted text-sm mb-6"
+        >
+          ✕ Close
+        </button>
 
         <div className="aspect-[3/4] rounded-3xl overflow-hidden mb-6 bg-surface border border-border flex items-center justify-center">
           {item.image_url ? (
-            <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
+            <img
+              src={item.image_url}
+              alt={`${item.brand ? item.brand + ' ' : ''}${item.item_type}${item.colour ? ', ' + item.colour : ''}`}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <span className="text-muted text-xs">No photo</span>
           )}
@@ -65,10 +107,11 @@ export default function ItemDetail({ item, onClose }) {
             disabled={isUpdating}
             className="w-full border border-border text-muted py-4 rounded-2xl text-sm disabled:opacity-40"
           >
-            {isUpdating ? '...' : item.status === 'active' ? 'Archive item' : 'Restore to wardrobe'}
+            {isUpdating ? 'Updating...' : item.status === 'active' ? 'Archive item' : 'Restore to wardrobe'}
           </button>
 
           <button
+            ref={deleteRef}
             type="button"
             onClick={handleDelete}
             disabled={isDeleting}
