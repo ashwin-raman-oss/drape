@@ -20,6 +20,8 @@ export default function LifestyleGrid({ selected, onChange }) {
         return (
           <button
             key={opt.id}
+            type="button"
+            aria-pressed={active}
             onClick={() => toggle(opt.id)}
             className={`w-full text-left px-5 py-4 rounded-2xl border transition-colors ${
               active

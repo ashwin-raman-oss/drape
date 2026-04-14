@@ -9,10 +9,17 @@ export default function Onboarding({ userId }) {
   const navigate = useNavigate()
   const { mutateAsync, isPending } = useUpsertProfile()
 
+  const [saveError, setSaveError] = useState(null)
+
   async function handleContinue() {
-    if (!selected.length) return
-    await mutateAsync({ userId, lifestyleContext: selected })
-    navigate('/')
+    if (!userId || !selected.length) return
+    setSaveError(null)
+    try {
+      await mutateAsync({ userId, lifestyleContext: selected })
+      navigate('/')
+    } catch {
+      setSaveError('Could not save your preferences. Please try again.')
+    }
   }
 
   return (
@@ -24,9 +31,12 @@ export default function Onboarding({ userId }) {
 
       <LifestyleGrid selected={selected} onChange={setSelected} />
 
+      {saveError && <p className="text-red-400 text-sm mt-4">{saveError}</p>}
+
       <div className="flex-1" />
 
       <button
+        type="button"
         onClick={handleContinue}
         disabled={!selected.length || isPending}
         className="w-full bg-accent text-bg py-4 rounded-2xl font-medium tracking-wide mt-8 disabled:opacity-40"
