@@ -26,6 +26,7 @@ export function useAddItem() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (itemData) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('wardrobe_items')
         .insert({ ...itemData, user_id: session.user.id })
@@ -34,7 +35,7 @@ export function useAddItem() {
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['wardrobe', session.user.id] }),
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['wardrobe', data?.user_id ?? session?.user?.id] }),
   })
 }
 
@@ -43,6 +44,7 @@ export function useUpdateItem() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, ...updates }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('wardrobe_items')
         .update(updates)
@@ -53,7 +55,7 @@ export function useUpdateItem() {
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['wardrobe', session.user.id] }),
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['wardrobe', data?.user_id ?? session?.user?.id] }),
   })
 }
 
@@ -62,6 +64,7 @@ export function useDeleteItem() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (id) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
       const { error } = await supabase
         .from('wardrobe_items')
         .delete()
@@ -69,6 +72,6 @@ export function useDeleteItem() {
         .eq('user_id', session.user.id)
       if (error) throw error
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['wardrobe', session.user.id] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['wardrobe', session?.user?.id] }),
   })
 }

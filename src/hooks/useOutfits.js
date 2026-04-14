@@ -26,6 +26,7 @@ export function useAddOutfitLog() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ occasion, weather, itemIds }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('outfit_logs')
         .insert({ user_id: session.user.id, occasion, weather, item_ids: itemIds })
@@ -34,7 +35,7 @@ export function useAddOutfitLog() {
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfit_logs', session.user.id] }),
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['outfit_logs', data?.user_id ?? session?.user?.id] }),
   })
 }
 
@@ -43,9 +44,13 @@ export function useUpdateOutfitLog() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, worn_at, rating, comment }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
+      const updates = Object.fromEntries(
+        Object.entries({ worn_at, rating, comment }).filter(([, v]) => v !== undefined)
+      )
       const { data, error } = await supabase
         .from('outfit_logs')
-        .update({ worn_at, rating, comment })
+        .update(updates)
         .eq('id', id)
         .eq('user_id', session.user.id)
         .select()
@@ -53,7 +58,7 @@ export function useUpdateOutfitLog() {
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfit_logs', session.user.id] }),
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['outfit_logs', data?.user_id ?? session?.user?.id] }),
   })
 }
 
@@ -80,6 +85,7 @@ export function useSaveLook() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ occasion, weather, itemIds }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('saved_looks')
         .insert({ user_id: session.user.id, occasion, weather, item_ids: itemIds })
@@ -88,6 +94,6 @@ export function useSaveLook() {
       if (error) throw error
       return data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['saved_looks', session.user.id] }),
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['saved_looks', data?.user_id ?? session?.user?.id] }),
   })
 }
