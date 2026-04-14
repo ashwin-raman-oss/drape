@@ -1,3 +1,45 @@
+import { useNavigate } from 'react-router-dom'
+import MobileLayout from '../components/layout/MobileLayout'
+import { useFlowStore } from '../store/flowStore'
+
+const WEATHER_OPTIONS = [
+  { key: 'Warm',  emoji: '☀️', label: 'Warm',  sub: '20°C+' },
+  { key: 'Mild',  emoji: '🌤️', label: 'Mild',  sub: '12–20°C' },
+  { key: 'Cold',  emoji: '🧥', label: 'Cold',  sub: 'Below 12°C' },
+  { key: 'Rainy', emoji: '🌧️', label: 'Rainy', sub: 'Any temp' },
+]
+
 export default function Weather() {
-  return <div className="min-h-screen bg-bg text-primary p-8">Weather</div>
+  const { occasion, setWeather } = useFlowStore(s => ({ occasion: s.occasion, setWeather: s.setWeather }))
+  const navigate = useNavigate()
+
+  function handleSelect(key) {
+    setWeather(key)
+    navigate('/recommendations')
+  }
+
+  return (
+    <MobileLayout className="px-6 pt-14">
+      {/* Back */}
+      <button type="button" onClick={() => navigate(-1)} className="text-muted text-sm mb-8">← Back</button>
+
+      <p className="text-muted text-xs tracking-widest uppercase mb-1">{occasion}</p>
+      <h1 className="text-2xl font-light text-primary mb-10">What's the weather like?</h1>
+
+      <div className="grid grid-cols-2 gap-4">
+        {WEATHER_OPTIONS.map(opt => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => handleSelect(opt.key)}
+            className="bg-surface border border-border rounded-3xl py-8 flex flex-col items-center gap-2 active:bg-border transition-colors"
+          >
+            <span className="text-5xl">{opt.emoji}</span>
+            <span className="text-primary font-medium">{opt.label}</span>
+            <span className="text-muted text-xs">{opt.sub}</span>
+          </button>
+        ))}
+      </div>
+    </MobileLayout>
+  )
 }
