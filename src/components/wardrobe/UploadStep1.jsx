@@ -1,11 +1,14 @@
-import { useRef } from 'react'
+import { useRef, useMemo, useEffect } from 'react'
 
 // Defined at module scope — NOT inside UploadStep1 — to prevent remount on every render
 function PhotoSlot({ file, label, inputRef, description }) {
-  const preview = file ? URL.createObjectURL(file) : null
+  const preview = useMemo(() => (file ? URL.createObjectURL(file) : null), [file])
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview) }, [preview])
+
   return (
     <button
       type="button"
+      aria-label={file ? `${label} — tap to change` : `${label} — tap to add`}
       onClick={() => inputRef.current.click()}
       className="w-full aspect-[3/4] rounded-3xl border-2 border-dashed border-border bg-surface flex flex-col items-center justify-center overflow-hidden"
     >
@@ -28,7 +31,7 @@ export default function UploadStep1({ itemPhoto, labelPhoto, onItemPhoto, onLabe
 
   function handleFile(e, setter) {
     const file = e.target.files[0]
-    if (file) setter(file)
+    if (file && file.type.startsWith('image/')) setter(file)
   }
 
   return (

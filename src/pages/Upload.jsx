@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileLayout from '../components/layout/MobileLayout'
 import UploadStep1 from '../components/wardrobe/UploadStep1'
@@ -20,7 +20,8 @@ async function fileToBase64(file) {
 }
 
 async function uploadImage(file, userId, slot) {
-  const ext = file.name.split('.').pop()
+  const MIME_TO_EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/heic': 'heic' }
+  const ext = MIME_TO_EXT[file.type] ?? 'jpg'
   const path = `${userId}/${Date.now()}-${slot}.${ext}`
   const { error } = await supabase.storage.from('wardrobe-images').upload(path, file)
   if (error) throw error
@@ -38,11 +39,14 @@ export default function Upload() {
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
 
+  const abortRef = useRef(false)
+
   const navigate = useNavigate()
   const { session } = useAuth()
   const { mutateAsync: addItem } = useAddItem()
 
   async function handleTagWithAI() {
+    abortRef.current = false
     setStep(2)
     try {
       const itemB64 = await fileToBase64(itemPhoto)
@@ -59,13 +63,17 @@ export default function Upload() {
         max_tokens: 512,
         messages: [{ role: 'user', content }],
       })
-      const parsed = extractJSON(response)
-      setTags(parsed)
-      setStep(3)
+      if (!abortRef.current) {
+        const parsed = extractJSON(response)
+        setTags(parsed)
+        setStep(3)
+      }
     } catch {
-      // Fall through to step 3 with empty tags for manual entry
-      setTags({})
-      setStep(3)
+      if (!abortRef.current) {
+        // Fall through to step 3 with empty tags for manual entry
+        setTags({})
+        setStep(3)
+      }
     }
   }
 
@@ -108,7 +116,11 @@ export default function Upload() {
       <button
         type="button"
         aria-label={step === 1 ? 'Cancel upload' : 'Go back'}
-        onClick={() => step === 1 ? navigate(-1) : setStep(step - 1)}
+        onClick={() => {
+          abortRef.current = true
+          if (step === 1) navigate(-1)
+          else setStep(step - 1)
+        }}
         className="text-muted text-sm mb-6"
       >
         {step === 1 ? '← Cancel' : '← Back'}
@@ -121,7 +133,7 @@ export default function Upload() {
       </h1>
 
       {saveError && (
-        <p className="text-sm text-center mb-4" style={{ color: '#ef4444' }}>{saveError}</p>
+        <p className="text-sm text-center mb-4 text-red-500">{saveError}</p>
       )}
 
       {step === 1 && (

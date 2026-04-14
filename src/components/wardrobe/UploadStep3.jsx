@@ -8,10 +8,12 @@ export default function UploadStep3({ tags, onTagChange, personalNotes, onPerson
   }
 
   function field(label, value, onChange, type = 'text') {
+    const id = label.toLowerCase().replace(/\s+/g, '-')
     return (
       <div>
-        <label className="text-xs text-muted tracking-wide uppercase mb-1 block">{label}</label>
+        <label htmlFor={id} className="text-xs text-muted tracking-wide uppercase mb-1 block">{label}</label>
         <input
+          id={id}
           type={type}
           value={value ?? ''}
           onChange={e => onChange(e.target.value)}
