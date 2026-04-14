@@ -18,24 +18,25 @@ export default function Recommendations() {
   const setRecommendations = useFlowStore(s => s.setRecommendations)
   const navigate = useNavigate()
   const { session } = useAuth()
-  const { data: wardrobe = [] } = useWardrobe()
-  const { data: outfitLogs = [] } = useOutfitLogs()
-  const { data: profile } = useProfile(session?.user?.id)
+  const { data: wardrobe = [], isSuccess: wardrobeReady } = useWardrobe()
+  const { data: outfitLogs = [], isSuccess: logsReady } = useOutfitLogs()
+  const { data: profile, isSuccess: profileReady } = useProfile(session?.user?.id)
   const { mutateAsync: saveLook } = useSaveLook()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [savingLook, setSavingLook] = useState(null)
+  const [saveError, setSaveError] = useState(null)
 
   useEffect(() => {
     if (!occasion || !weather) {
       navigate('/', { replace: true })
       return
     }
-    if (!recommendations) {
+    if (!recommendations && wardrobeReady && logsReady && profileReady) {
       fetchRecommendations()
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [wardrobeReady, logsReady, profileReady]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function fetchRecommendations() {
     setLoading(true)
@@ -70,8 +71,11 @@ export default function Recommendations() {
 
   async function handleSaveLook(look) {
     setSavingLook(look.look_number)
+    setSaveError(null)
     try {
       await saveLook({ occasion, weather, itemIds: look.item_ids })
+    } catch {
+      setSaveError('Could not save look. Please try again.')
     } finally {
       setSavingLook(null)
     }
@@ -87,7 +91,7 @@ export default function Recommendations() {
   return (
     <MobileLayout className="pb-nav">
       <div className="px-6 pt-14 pb-4">
-        <button type="button" onClick={() => navigate(-1)} className="text-muted text-sm mb-6">← Back</button>
+        <button type="button" aria-label="Go back" onClick={() => navigate(-1)} className="text-muted text-sm mb-6">← Back</button>
         <p className="text-muted text-xs tracking-widest uppercase mb-1">{occasion} · {weather}</p>
         <h1 className="text-2xl font-light text-primary">Your looks</h1>
       </div>
@@ -105,6 +109,10 @@ export default function Recommendations() {
             <p className="text-muted text-sm mb-4">{error}</p>
             <button type="button" onClick={fetchRecommendations} className="text-accent text-sm">Try again</button>
           </div>
+        )}
+
+        {saveError && (
+          <p className="text-sm text-center" style={{ color: '#ef4444' }}>{saveError}</p>
         )}
 
         {!loading && !error && recommendations?.looks?.map(look => (
