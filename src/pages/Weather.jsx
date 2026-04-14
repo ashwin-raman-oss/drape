@@ -10,8 +10,16 @@ const WEATHER_OPTIONS = [
 ]
 
 export default function Weather() {
-  const { occasion, setWeather } = useFlowStore(s => ({ occasion: s.occasion, setWeather: s.setWeather }))
+  // Separate selectors avoid creating a new object on every render (rerender-no-inline-components)
+  const occasion = useFlowStore(s => s.occasion)
+  const setWeather = useFlowStore(s => s.setWeather)
   const navigate = useNavigate()
+
+  // Guard: if user lands here without an occasion (direct URL / browser history), send back to Home
+  if (!occasion) {
+    navigate('/', { replace: true })
+    return null
+  }
 
   function handleSelect(key) {
     setWeather(key)
@@ -31,6 +39,7 @@ export default function Weather() {
           <button
             key={opt.key}
             type="button"
+            aria-label={`${opt.label} — ${opt.sub}`}
             onClick={() => handleSelect(opt.key)}
             className="bg-surface border border-border rounded-3xl py-8 flex flex-col items-center gap-2 active:bg-border transition-colors"
           >
