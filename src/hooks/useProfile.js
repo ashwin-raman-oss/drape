@@ -32,6 +32,7 @@ export function useUpsertProfile() {
       if (error) throw error
       return data
     },
-    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['profile', data.user_id] }),
+    onSuccess: (data, variables) =>
+      qc.invalidateQueries({ queryKey: ['profile', data?.user_id ?? variables.userId] }),
   })
 }

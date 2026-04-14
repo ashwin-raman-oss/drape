@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export function useAuth() {
-  const [session, setSession] = useState(undefined) // undefined = loading
+  const [session, setSession] = useState(undefined)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    let initialised = false
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!initialised) setSession(data.session)
+    })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      initialised = true   // listener wins from here on
       setSession(session)
     })
+
     return () => subscription.unsubscribe()
   }, [])
 

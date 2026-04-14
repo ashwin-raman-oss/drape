@@ -11,18 +11,44 @@ import Upload from './pages/Upload'
 import History from './pages/History'
 import Settings from './pages/Settings'
 
-function ProtectedApp({ userId }) {
-  const { data: profile, isLoading } = useProfile(userId)
+export default function App() {
+  const { session, loading: authLoading } = useAuth()
+  // Fire profile fetch in parallel with auth check — enabled guard prevents premature fetch
+  const { data: profile, isLoading: profileLoading, isError: profileError } = useProfile(session?.user?.id)
 
-  if (isLoading) {
-    return <div className="min-h-screen bg-bg flex items-center justify-center text-muted text-sm">Loading...</div>
+  // Show blank screen while auth resolves, or while profile fetches for an authenticated user
+  if (authLoading || (session && profileLoading)) {
+    return <div className="min-h-screen bg-bg" />
   }
 
-  // First time: no profile or empty lifestyle context → onboarding
+  if (!session) {
+    return (
+      <Routes>
+        <Route path="*" element={<Auth />} />
+      </Routes>
+    )
+  }
+
+  // Profile fetch failed — surface an actionable error
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 text-center gap-4">
+        <p className="text-red-400 text-sm">Failed to load your profile. Please refresh or sign out.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="text-accent text-sm"
+        >
+          Refresh
+        </button>
+      </div>
+    )
+  }
+
+  // First time — no profile or empty lifestyle context
   if (!profile || !profile.lifestyle_context?.length) {
     return (
       <Routes>
-        <Route path="/onboarding" element={<Onboarding userId={userId} />} />
+        <Route path="/onboarding" element={<Onboarding userId={session.user.id} />} />
         <Route path="*" element={<Navigate to="/onboarding" replace />} />
       </Routes>
     )
@@ -36,26 +62,8 @@ function ProtectedApp({ userId }) {
       <Route path="/wardrobe" element={<Wardrobe />} />
       <Route path="/upload" element={<Upload />} />
       <Route path="/history" element={<History />} />
-      <Route path="/settings" element={<Settings userId={userId} />} />
+      <Route path="/settings" element={<Settings userId={session.user.id} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
-}
-
-export default function App() {
-  const { session, loading } = useAuth()
-
-  if (loading) {
-    return <div className="min-h-screen bg-bg" />
-  }
-
-  if (!session) {
-    return (
-      <Routes>
-        <Route path="*" element={<Auth />} />
-      </Routes>
-    )
-  }
-
-  return <ProtectedApp userId={session.user.id} />
 }
