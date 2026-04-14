@@ -5,7 +5,7 @@ import BottomNav from '../components/layout/BottomNav'
 import OutfitLook from '../components/recommendations/OutfitLook'
 import { useFlowStore } from '../store/flowStore'
 import { useWardrobe } from '../hooks/useWardrobe'
-import { useOutfitLogs, useSaveLook } from '../hooks/useOutfits'
+import { useOutfitLogs, useSaveLook, useAddOutfitLog } from '../hooks/useOutfits'
 import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
 import { callClaude, extractJSON } from '../lib/claude'
@@ -22,6 +22,7 @@ export default function Recommendations() {
   const { data: outfitLogs = [], isSuccess: logsReady } = useOutfitLogs()
   const { data: profile, isSuccess: profileReady } = useProfile(session?.user?.id)
   const { mutateAsync: saveLook } = useSaveLook()
+  const { mutateAsync: addOutfitLog } = useAddOutfitLog()
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -73,7 +74,10 @@ export default function Recommendations() {
     setSavingLook(look.look_number)
     setSaveError(null)
     try {
-      await saveLook({ occasion, weather, itemIds: look.item_ids })
+      await Promise.all([
+        saveLook({ occasion, weather, itemIds: look.item_ids }),
+        addOutfitLog({ occasion, weather, itemIds: look.item_ids }),
+      ])
     } catch {
       setSaveError('Could not save look. Please try again.')
     } finally {
