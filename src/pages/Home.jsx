@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
@@ -7,8 +7,12 @@ import { useFlowStore } from '../store/flowStore'
 
 export default function Home() {
   const setOccasion = useFlowStore(s => s.setOccasion)
+  const resetFlow = useFlowStore(s => s.resetFlow)
   const [text, setText] = useState('')
   const navigate = useNavigate()
+
+  // Clear any stale flow state from a previous session
+  useEffect(() => { resetFlow() }, [])
 
   function handlePreset(label) {
     setText(label)
