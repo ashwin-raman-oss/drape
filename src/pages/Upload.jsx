@@ -38,6 +38,7 @@ export default function Upload() {
   const [personalNotes, setPersonalNotes] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [tagError, setTagError] = useState(null)
 
   const abortRef = useRef(false)
 
@@ -47,6 +48,7 @@ export default function Upload() {
 
   async function handleTagWithAI() {
     abortRef.current = false
+    setTagError(null)
     setStep(2)
     try {
       const itemB64 = await fileToBase64(itemPhoto)
@@ -59,7 +61,7 @@ export default function Upload() {
         content.push({ type: 'image', source: { type: 'base64', media_type: labelPhoto.type, data: labelB64 } })
       }
       const response = await callClaude({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-6',
         max_tokens: 512,
         messages: [{ role: 'user', content }],
       })
@@ -68,9 +70,9 @@ export default function Upload() {
         setTags(parsed)
         setStep(3)
       }
-    } catch {
+    } catch (err) {
       if (!abortRef.current) {
-        // Fall through to step 3 with empty tags for manual entry
+        setTagError(err?.message ?? 'AI tagging failed — fill in details below.')
         setTags({})
         setStep(3)
       }
@@ -104,8 +106,8 @@ export default function Upload() {
         personal_notes: personalNotes || null,
       })
       navigate('/wardrobe')
-    } catch {
-      setSaveError('Could not save item. Please try again.')
+    } catch (err) {
+      setSaveError(err?.message ? `Could not save item: ${err.message}` : 'Could not save item. Please try again.')
     } finally {
       setIsSaving(false)
     }
@@ -146,6 +148,9 @@ export default function Upload() {
         />
       )}
       {step === 2 && <UploadStep2 />}
+      {step === 3 && tagError && (
+        <p className="text-sm text-amber-600 mb-4">AI tagging unavailable — fill in details below. ({tagError})</p>
+      )}
       {step === 3 && (
         <UploadStep3
           tags={tags}

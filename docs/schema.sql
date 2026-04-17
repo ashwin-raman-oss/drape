@@ -9,10 +9,12 @@
 --   Name: wardrobe-images
 --   Public: yes
 --
---   Then run this policy in SQL Editor:
+--   Then run docs/storage-policy-fix.sql in SQL Editor (or paste):
+--   drop policy if exists "users manage own images" on storage.objects;
 --   create policy "users manage own images"
---     on storage.objects for all
---     using (auth.uid()::text = (storage.foldername(name))[1]);
+--     on storage.objects for all to authenticated
+--     using  (bucket_id = 'wardrobe-images' and auth.uid()::text = (storage.foldername(name))[1])
+--     with check (bucket_id = 'wardrobe-images' and auth.uid()::text = (storage.foldername(name))[1]);
 
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
