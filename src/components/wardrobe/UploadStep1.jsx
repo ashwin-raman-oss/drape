@@ -36,9 +36,9 @@ export default function UploadStep1({ itemPhoto, labelPhoto, onItemPhoto, onLabe
 
   return (
     <div className="space-y-6">
-      <input ref={itemRef} type="file" accept="image/*" capture="environment" className="hidden"
+      <input ref={itemRef} type="file" accept="image/*" className="hidden"
         onChange={e => handleFile(e, onItemPhoto)} />
-      <input ref={labelRef} type="file" accept="image/*" capture="environment" className="hidden"
+      <input ref={labelRef} type="file" accept="image/*" className="hidden"
         onChange={e => handleFile(e, onLabelPhoto)} />
 
       <div className="grid grid-cols-2 gap-3">
