@@ -10,12 +10,30 @@ import { supabase } from '../lib/supabase'
 import { useAddItem } from '../hooks/useWardrobe'
 import { useAuth } from '../hooks/useAuth'
 
-async function fileToBase64(file) {
+const MAX_VISION_PX = 1024
+const VISION_QUALITY = 0.8
+
+async function fileToBase64ForVision(file) {
+  const bitmap = await createImageBitmap(file)
+  const { width, height } = bitmap
+  const scale = Math.min(1, MAX_VISION_PX / Math.max(width, height))
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(width * scale)
+  canvas.height = Math.round(height * scale)
+  canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = reject
-    reader.readAsDataURL(file)
+    canvas.toBlob(
+      blob => {
+        if (!blob) { reject(new Error('Canvas toBlob failed')); return }
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result.split(',')[1])
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+      },
+      'image/jpeg',
+      VISION_QUALITY,
+    )
   })
 }
 
@@ -51,14 +69,14 @@ export default function Upload() {
     setTagError(null)
     setStep(2)
     try {
-      const itemB64 = await fileToBase64(itemPhoto)
+      const itemB64 = await fileToBase64ForVision(itemPhoto)
       const content = [
         { type: 'text', text: buildTaggingPrompt() },
-        { type: 'image', source: { type: 'base64', media_type: itemPhoto.type, data: itemB64 } },
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: itemB64 } },
       ]
       if (labelPhoto) {
-        const labelB64 = await fileToBase64(labelPhoto)
-        content.push({ type: 'image', source: { type: 'base64', media_type: labelPhoto.type, data: labelB64 } })
+        const labelB64 = await fileToBase64ForVision(labelPhoto)
+        content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: labelB64 } })
       }
       const response = await callClaude({
         model: 'claude-sonnet-4-6',
