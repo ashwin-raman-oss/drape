@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
@@ -46,17 +46,7 @@ export default function Recommendations() {
 
   const activeItems = wardrobe.filter(i => i.status === 'active')
 
-  useEffect(() => {
-    if (!occasion || !weather) {
-      navigate('/', { replace: true })
-      return
-    }
-    if (!recommendations && wardrobeReady && logsReady && profileReady) {
-      fetchRecommendations()
-    }
-  }, [wardrobeReady, logsReady, profileReady]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function fetchRecommendations() {
+  const fetchRecommendations = useCallback(async () => {
     if (activeItems.length < 3) return
     setLoading(true)
     setError(null)
@@ -86,7 +76,17 @@ export default function Recommendations() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [occasion, weather, wardrobe, outfitLogs, profile, activeItems.length, setRecommendations])
+
+  useEffect(() => {
+    if (!occasion || !weather) {
+      navigate('/', { replace: true })
+      return
+    }
+    if (!recommendations && wardrobeReady && logsReady && profileReady) {
+      fetchRecommendations()
+    }
+  }, [occasion, weather, recommendations, wardrobeReady, logsReady, profileReady, fetchRecommendations, navigate])
 
   async function handleSaveLook(look) {
     setSavingLook(look.look_number)
@@ -104,7 +104,7 @@ export default function Recommendations() {
     }
   }
 
-  const wardrobeById = new Map(wardrobe.map(item => [item.id, item]))
+  const wardrobeById = useMemo(() => new Map(wardrobe.map(item => [item.id, item])), [wardrobe])
 
   function getLookItems(itemIds) {
     return itemIds.map(id => wardrobeById.get(id)).filter(Boolean)
