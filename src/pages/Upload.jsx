@@ -64,7 +64,7 @@ export default function Upload() {
   const { session } = useAuth()
   const { mutateAsync: addItem } = useAddItem()
 
-  async function handleTagWithAI() {
+  async function runTagging() {
     abortRef.current = false
     setTagError(null)
     setStep(2)
@@ -153,7 +153,7 @@ export default function Upload() {
       </h1>
 
       {saveError && (
-        <p className="text-sm text-center mb-4 text-red-500">{saveError}</p>
+        <p className="text-sm text-center mb-4 text-red-400">{saveError}</p>
       )}
 
       {step === 1 && (
@@ -162,13 +162,10 @@ export default function Upload() {
           labelPhoto={labelPhoto}
           onItemPhoto={setItemPhoto}
           onLabelPhoto={setLabelPhoto}
-          onNext={handleTagWithAI}
+          onNext={runTagging}
         />
       )}
       {step === 2 && <UploadStep2 />}
-      {step === 3 && tagError && (
-        <p className="text-sm text-amber-600 mb-4">AI tagging unavailable — fill in details below. ({tagError})</p>
-      )}
       {step === 3 && (
         <UploadStep3
           tags={tags}
@@ -179,6 +176,9 @@ export default function Upload() {
           onConditionFlags={setConditionFlags}
           onSave={handleSave}
           isSaving={isSaving}
+          tagError={tagError}
+          onDismissTagError={() => setTagError(null)}
+          onRetryTagging={runTagging}
         />
       )}
     </MobileLayout>

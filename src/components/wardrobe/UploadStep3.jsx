@@ -1,8 +1,13 @@
 const CATEGORIES = ['Top', 'Bottom', 'Shoes', 'Outer layer']
 const CONDITION_FLAGS = ['Casual only', 'Cold weather only', 'Formal only', 'Handle with care']
-const FORMALITY_LABELS = { 1: 'Loungewear', 2: 'Casual', 3: 'Smart casual', 4: 'Business', 5: 'Formal' }
 
-export default function UploadStep3({ tags, onTagChange, personalNotes, onPersonalNotes, conditionFlags, onConditionFlags, onSave, isSaving }) {
+export default function UploadStep3({
+  tags, onTagChange,
+  personalNotes, onPersonalNotes,
+  conditionFlags, onConditionFlags,
+  onSave, isSaving,
+  tagError, onDismissTagError, onRetryTagging,
+}) {
   function toggleFlag(flag) {
     onConditionFlags(conditionFlags.includes(flag) ? conditionFlags.filter(f => f !== flag) : [...conditionFlags, flag])
   }
@@ -17,7 +22,7 @@ export default function UploadStep3({ tags, onTagChange, personalNotes, onPerson
           type={type}
           value={value ?? ''}
           onChange={e => onChange(e.target.value)}
-          className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-primary text-sm focus:outline-none focus:border-accent"
+          className="w-full bg-surface border border-border rounded-2xl px-4 py-3 text-primary text-sm focus:outline-none focus:border-accent"
         />
       </div>
     )
@@ -25,9 +30,35 @@ export default function UploadStep3({ tags, onTagChange, personalNotes, onPerson
 
   return (
     <div className="space-y-5">
+      {/* AI tagging error banner — dismissible */}
+      {tagError && (
+        <div className="bg-surface border border-amber-900/40 rounded-2xl px-4 py-3 flex items-start justify-between gap-3">
+          <div className="flex-1">
+            <p className="text-amber-500 text-xs leading-relaxed">
+              AI tagging unavailable — fill in details below.
+            </p>
+            <button
+              type="button"
+              onClick={onRetryTagging}
+              className="text-accent text-xs mt-1"
+            >
+              Retry AI tagging
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={onDismissTagError}
+            aria-label="Dismiss"
+            className="text-muted text-sm leading-none mt-0.5"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Category */}
       <div>
-        <label className="text-xs text-muted tracking-wide uppercase mb-2 block">Category</label>
+        <label className="text-xs text-muted tracking-wide uppercase mb-2 block">Category <span className="text-red-400">*</span></label>
         <div className="flex gap-2 flex-wrap">
           {CATEGORIES.map(cat => (
             <button
@@ -49,22 +80,23 @@ export default function UploadStep3({ tags, onTagChange, personalNotes, onPerson
       {field('Material', tags.material, v => onTagChange('material', v))}
       {field('Brand', tags.brand, v => onTagChange('brand', v))}
 
-      {/* Formality */}
+      {/* Formality — all labels shown upfront */}
       <div>
-        <label className="text-xs text-muted tracking-wide uppercase mb-2 block">
-          Formality — {FORMALITY_LABELS[tags.formality] ?? ''}
-        </label>
+        <label className="text-xs text-muted tracking-wide uppercase mb-2 block">Formality</label>
         <div className="flex gap-2">
-          {[1,2,3,4,5].map(n => (
+          {[1, 2, 3, 4, 5].map(n => (
             <button
               key={n}
               type="button"
               onClick={() => onTagChange('formality', n)}
-              className={`flex-1 py-3 rounded-xl text-sm border transition-colors ${
+              className={`flex-1 py-3 rounded-xl text-sm border transition-colors flex flex-col items-center gap-0.5 ${
                 tags.formality === n ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted'
               }`}
             >
-              {n}
+              <span>{n}</span>
+              {n === 1 && <span className="text-[9px] leading-none opacity-70">Casual</span>}
+              {n === 3 && <span className="text-[9px] leading-none opacity-70">Smart</span>}
+              {n === 5 && <span className="text-[9px] leading-none opacity-70">Formal</span>}
             </button>
           ))}
         </div>
@@ -99,14 +131,14 @@ export default function UploadStep3({ tags, onTagChange, personalNotes, onPerson
           onChange={e => onPersonalNotes(e.target.value)}
           placeholder="Anything Claude should know about this piece..."
           rows={2}
-          className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-primary text-sm resize-none focus:outline-none focus:border-accent"
+          className="w-full bg-surface border border-border rounded-2xl px-4 py-3 text-primary text-sm resize-none focus:outline-none focus:border-accent"
         />
       </div>
 
       <button
         type="button"
         onClick={onSave}
-        disabled={isSaving || !tags.category || !tags.item_type}
+        disabled={isSaving || !tags.category}
         className="w-full bg-accent text-bg py-4 rounded-2xl font-medium tracking-wide disabled:opacity-40"
       >
         {isSaving ? 'Saving...' : 'Add to wardrobe'}
