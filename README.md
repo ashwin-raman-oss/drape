@@ -114,7 +114,7 @@ The recommendation flow has several transient UI steps: occasion selection, weat
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/drape.git
+git clone https://github.com/ashwin-raman-oss/drape.git
 cd drape
 
 # Set up environment variables
