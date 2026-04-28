@@ -88,7 +88,7 @@ When you request an outfit, the app assembles a context payload: your occasion a
 | Frontend | React 18 + Tailwind CSS |
 | State | Zustand (flow state) + TanStack Query (server state) |
 | Backend / DB | Supabase (Postgres + Storage + Auth) |
-| AI | Claude claude-sonnet-4-5 via Anthropic API (vision + reasoning) |
+| AI | Claude claude-sonnet-4-6 via Anthropic API (vision + reasoning) |
 | API Proxy | Vercel serverless function with JWT verification |
 | Deployment | Vercel |
 
