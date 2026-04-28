@@ -21,10 +21,13 @@ export default function HistoryEntry({ log, wardrobeItems }) {
   }
 
   async function saveComment() {
-    if (log.rating) {
+    if (log.rating !== null && log.rating !== undefined) {
       await updateLog({ id: log.id, rating: log.rating, comment })
     }
   }
+
+  const isWorn = !!log.worn_at
+  const isRated = log.rating !== null && log.rating !== undefined
 
   return (
     <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
@@ -33,12 +36,21 @@ export default function HistoryEntry({ log, wardrobeItems }) {
           <p className="text-primary text-sm font-medium">{log.occasion}</p>
           <p className="text-muted text-xs">{log.weather} · {new Date(log.created_at).toLocaleDateString()}</p>
         </div>
-        {log.worn_at ? (
-          <span className="text-xs text-muted border border-border px-2 py-1 rounded-lg">Worn</span>
-        ) : (
-          <button type="button" onClick={markWorn} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg">
+
+        {!isWorn && (
+          <button type="button" onClick={markWorn} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg flex-shrink-0">
             Mark worn
           </button>
+        )}
+        {isWorn && !isRated && !showRating && (
+          <button type="button" onClick={() => setShowRating(true)} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg flex-shrink-0">
+            Rate this look
+          </button>
+        )}
+        {isWorn && isRated && (
+          <span className="text-xs text-muted border border-border px-2 py-1 rounded-lg flex-shrink-0">
+            {log.rating === 1 ? '👍' : '👎'}
+          </span>
         )}
       </div>
 
@@ -46,7 +58,7 @@ export default function HistoryEntry({ log, wardrobeItems }) {
       {items.length > 0 && (
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {items.map(item => (
-            <div key={item.id} className="w-14 h-[72px] rounded-xl overflow-hidden flex-shrink-0 border border-border">
+            <div key={item.id} className="w-14 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border">
               {item.image_url ? (
                 <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
               ) : (
@@ -59,8 +71,8 @@ export default function HistoryEntry({ log, wardrobeItems }) {
         </div>
       )}
 
-      {/* Rating — shown after mark worn, or if already worn */}
-      {(log.worn_at || showRating) && (
+      {/* Rating form — shown after mark worn or tapping Rate this look */}
+      {(isWorn && showRating) || (isWorn && isRated) ? (
         <div className="flex items-center gap-3">
           {[{ val: 1, emoji: '👍' }, { val: -1, emoji: '👎' }].map(({ val, emoji }) => (
             <button
@@ -82,7 +94,7 @@ export default function HistoryEntry({ log, wardrobeItems }) {
             className="flex-1 bg-transparent text-xs text-muted border-b border-border focus:outline-none focus:border-accent py-1"
           />
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
