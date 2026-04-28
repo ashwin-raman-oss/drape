@@ -10,6 +10,7 @@ import Wardrobe from './pages/Wardrobe'
 import Upload from './pages/Upload'
 import History from './pages/History'
 import Settings from './pages/Settings'
+import Saved from './pages/Saved'
 
 export default function App() {
   const { session, loading: authLoading } = useAuth()
@@ -61,6 +62,7 @@ export default function App() {
       <Route path="/recommendations" element={<Recommendations />} />
       <Route path="/wardrobe" element={<Wardrobe />} />
       <Route path="/upload" element={<Upload />} />
+      <Route path="/saved" element={<Saved />} />
       <Route path="/history" element={<History />} />
       <Route path="/settings" element={<Settings userId={session.user.id} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
