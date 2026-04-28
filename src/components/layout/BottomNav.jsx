@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 const tabs = [
   { to: '/',         label: 'Today',    icon: '✦' },
@@ -9,8 +9,6 @@ const tabs = [
 ]
 
 export default function BottomNav({ onNavAttempt }) {
-  const navigate = useNavigate()
-
   return (
     <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface border-t border-border flex safe-bottom">
       {tabs.map(tab => {
