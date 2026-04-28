@@ -5,19 +5,30 @@ export default function HistoryEntry({ log, wardrobeItems }) {
   const { mutateAsync: updateLog } = useUpdateOutfitLog()
   const [comment, setComment] = useState(log.comment ?? '')
   const [showRating, setShowRating] = useState(false)
+  const [actionError, setActionError] = useState(null)
 
   const items = (log.item_ids ?? [])
     .map(id => wardrobeItems.find(w => w.id === id))
     .filter(Boolean)
 
   async function markWorn() {
-    await updateLog({ id: log.id, worn_at: new Date().toISOString() })
-    setShowRating(true)
+    setActionError(null)
+    try {
+      await updateLog({ id: log.id, worn_at: new Date().toISOString() })
+      setShowRating(true)
+    } catch {
+      setActionError('Could not update. Try again.')
+    }
   }
 
   async function rate(rating) {
-    await updateLog({ id: log.id, rating, comment })
-    setShowRating(false)
+    setActionError(null)
+    try {
+      await updateLog({ id: log.id, rating, comment })
+      setShowRating(false)
+    } catch {
+      setActionError('Could not save rating. Try again.')
+    }
   }
 
   async function saveComment() {
@@ -70,6 +81,8 @@ export default function HistoryEntry({ log, wardrobeItems }) {
           ))}
         </div>
       )}
+
+      {actionError && <p className="text-red-400 text-xs">{actionError}</p>}
 
       {/* Rating form — shown after mark worn or tapping Rate this look */}
       {(isWorn && showRating) || (isWorn && isRated) ? (
