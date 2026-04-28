@@ -8,6 +8,7 @@ import Weather from './pages/Weather'
 import Recommendations from './pages/Recommendations'
 import Wardrobe from './pages/Wardrobe'
 import Upload from './pages/Upload'
+import WardrobeIntro from './pages/WardrobeIntro'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Saved from './pages/Saved'
@@ -62,6 +63,7 @@ export default function App() {
       <Route path="/recommendations" element={<Recommendations />} />
       <Route path="/wardrobe" element={<Wardrobe />} />
       <Route path="/upload" element={<Upload />} />
+      <Route path="/wardrobe-intro" element={<WardrobeIntro />} />
       <Route path="/saved" element={<Saved />} />
       <Route path="/history" element={<History />} />
       <Route path="/settings" element={<Settings userId={session.user.id} />} />

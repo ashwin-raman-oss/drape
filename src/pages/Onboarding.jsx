@@ -16,7 +16,7 @@ export default function Onboarding({ userId }) {
     setSaveError(null)
     try {
       await mutateAsync({ userId, lifestyleContext: selected })
-      navigate('/')
+      navigate('/wardrobe-intro')
     } catch {
       setSaveError('Could not save your preferences. Please try again.')
     }
