@@ -1,6 +1,22 @@
 const CATEGORIES = ['Top', 'Bottom', 'Shoes', 'Outer layer']
 const CONDITION_FLAGS = ['Casual only', 'Cold weather only', 'Formal only', 'Handle with care']
 
+function Field({ label, value, onChange, type = 'text' }) {
+  const id = label.toLowerCase().replace(/\s+/g, '-')
+  return (
+    <div>
+      <label htmlFor={id} className="text-xs text-muted tracking-wide uppercase mb-1 block">{label}</label>
+      <input
+        id={id}
+        type={type}
+        value={value ?? ''}
+        onChange={e => onChange(e.target.value)}
+        className="w-full bg-surface border border-border rounded-2xl px-4 py-3 text-primary text-sm focus:outline-none focus:border-accent"
+      />
+    </div>
+  )
+}
+
 export default function UploadStep3({
   tags, onTagChange,
   personalNotes, onPersonalNotes,
@@ -10,22 +26,6 @@ export default function UploadStep3({
 }) {
   function toggleFlag(flag) {
     onConditionFlags(conditionFlags.includes(flag) ? conditionFlags.filter(f => f !== flag) : [...conditionFlags, flag])
-  }
-
-  function field(label, value, onChange, type = 'text') {
-    const id = label.toLowerCase().replace(/\s+/g, '-')
-    return (
-      <div>
-        <label htmlFor={id} className="text-xs text-muted tracking-wide uppercase mb-1 block">{label}</label>
-        <input
-          id={id}
-          type={type}
-          value={value ?? ''}
-          onChange={e => onChange(e.target.value)}
-          className="w-full bg-surface border border-border rounded-2xl px-4 py-3 text-primary text-sm focus:outline-none focus:border-accent"
-        />
-      </div>
-    )
   }
 
   return (
@@ -75,10 +75,10 @@ export default function UploadStep3({
         </div>
       </div>
 
-      {field('Item type', tags.item_type, v => onTagChange('item_type', v))}
-      {field('Colour', tags.colour, v => onTagChange('colour', v))}
-      {field('Material', tags.material, v => onTagChange('material', v))}
-      {field('Brand', tags.brand, v => onTagChange('brand', v))}
+      <Field label="Item type" value={tags.item_type} onChange={v => onTagChange('item_type', v)} />
+      <Field label="Colour" value={tags.colour} onChange={v => onTagChange('colour', v)} />
+      <Field label="Material" value={tags.material} onChange={v => onTagChange('material', v)} />
+      <Field label="Brand" value={tags.brand} onChange={v => onTagChange('brand', v)} />
 
       {/* Formality — all labels shown upfront */}
       <div>
@@ -102,7 +102,7 @@ export default function UploadStep3({
         </div>
       </div>
 
-      {field('Style notes', tags.style_notes, v => onTagChange('style_notes', v))}
+      <Field label="Style notes" value={tags.style_notes} onChange={v => onTagChange('style_notes', v)} />
 
       {/* Condition flags */}
       <div>
@@ -125,8 +125,9 @@ export default function UploadStep3({
 
       {/* Personal notes */}
       <div>
-        <label className="text-xs text-muted tracking-wide uppercase mb-1 block">Personal notes</label>
+        <label htmlFor="personal-notes" className="text-xs text-muted tracking-wide uppercase mb-1 block">Personal notes</label>
         <textarea
+          id="personal-notes"
           value={personalNotes}
           onChange={e => onPersonalNotes(e.target.value)}
           placeholder="Anything Claude should know about this piece..."

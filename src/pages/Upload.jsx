@@ -118,7 +118,7 @@ export default function Upload() {
         colour: tags.colour,
         material: tags.material || null,
         brand: tags.brand || null,
-        formality: tags.formality || 3,
+        formality: tags.formality ?? 3,
         style_notes: tags.style_notes || null,
         condition_flags: conditionFlags,
         personal_notes: personalNotes || null,
