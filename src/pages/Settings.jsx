@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
@@ -7,13 +7,42 @@ import { useProfile, useUpsertProfile } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
 
 function UnsavedModal({ onLeave, onStay }) {
+  const leaveRef = useRef(null)
+
+  useEffect(() => {
+    const prev = document.activeElement
+    leaveRef.current?.focus()
+    return () => { prev?.focus() }
+  }, [])
+
+  function handleKeyDown(e) {
+    if (e.key === 'Escape') { e.preventDefault(); onLeave() }
+    if (e.key !== 'Tab') return
+    const all = Array.from(document.querySelectorAll('[data-unsaved-modal]'))
+    if (!all.length) return
+    const first = all[0]
+    const last = all[all.length - 1]
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/80 z-[60] flex items-end justify-center p-4">
-      <div className="bg-surface border border-border rounded-3xl p-6 w-full max-w-md space-y-4">
-        <h3 className="text-primary font-medium text-base">Unsaved changes</h3>
+    <div
+      className="fixed inset-0 bg-black/80 z-[60] flex items-end justify-center p-4"
+      onKeyDown={handleKeyDown}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="unsaved-modal-title"
+        className="bg-surface border border-border rounded-3xl p-6 w-full max-w-md space-y-4"
+      >
+        <h3 id="unsaved-modal-title" className="text-primary font-medium text-base">Unsaved changes</h3>
         <p className="text-muted text-sm">You have unsaved changes. Leave without saving?</p>
         <div className="space-y-3 pt-1">
           <button
+            ref={leaveRef}
+            data-unsaved-modal
             type="button"
             onClick={onLeave}
             className="w-full border border-border text-muted py-4 rounded-2xl text-sm"
@@ -21,6 +50,7 @@ function UnsavedModal({ onLeave, onStay }) {
             Leave
           </button>
           <button
+            data-unsaved-modal
             type="button"
             onClick={onStay}
             className="w-full bg-accent text-bg py-4 rounded-2xl text-sm font-medium"
@@ -39,11 +69,18 @@ export default function Settings({ userId }) {
   const { mutateAsync: upsertProfile, isPending } = useUpsertProfile()
   const [selected, setSelected] = useState([])
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState(null)
   const [pendingNav, setPendingNav] = useState(null) // path to navigate to if user confirms leave
 
   useEffect(() => {
     if (profile?.lifestyle_context) setSelected(profile.lifestyle_context)
   }, [profile])
+
+  useEffect(() => {
+    if (!saved) return
+    const id = setTimeout(() => setSaved(false), 3000)
+    return () => clearTimeout(id)
+  }, [saved])
 
   const savedContext = profile?.lifestyle_context ?? []
   const isDirty =
@@ -51,12 +88,16 @@ export default function Settings({ userId }) {
     selected.some(s => !savedContext.includes(s))
 
   async function handleSave() {
-    await upsertProfile({ userId, lifestyleContext: selected })
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
-    if (pendingNav) {
-      navigate(pendingNav)
-      setPendingNav(null)
+    setSaveError(null)
+    try {
+      await upsertProfile({ userId, lifestyleContext: selected })
+      setSaved(true)
+      if (pendingNav) {
+        navigate(pendingNav)
+        setPendingNav(null)
+      }
+    } catch {
+      setSaveError('Could not save changes. Please try again.')
     }
   }
 
@@ -91,6 +132,7 @@ export default function Settings({ userId }) {
             >
               {saved ? 'Saved ✓' : isPending ? 'Saving...' : 'Save changes'}
             </button>
+            {saveError && <p className="text-red-400 text-xs mt-2">{saveError}</p>}
           </div>
 
           <div className="border-t border-border pt-6">
@@ -98,13 +140,13 @@ export default function Settings({ userId }) {
           </div>
         </div>
 
-        <BottomNav onNavAttempt={isDirty ? handleNavAttempt : null} />
+        <BottomNav onNavAttempt={handleNavAttempt} />
       </MobileLayout>
 
       {pendingNav && (
         <UnsavedModal
           onLeave={() => { navigate(pendingNav); setPendingNav(null) }}
-          onStay={() => { setPendingNav(null); handleSave() }}
+          onStay={async () => { setPendingNav(null); await handleSave() }}
         />
       )}
     </>
