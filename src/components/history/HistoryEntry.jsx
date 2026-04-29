@@ -1,14 +1,36 @@
-import { useState } from 'react'
-import { useUpdateOutfitLog } from '../../hooks/useOutfits'
+import { useState, useRef, useEffect } from 'react'
+import { useUpdateOutfitLog, useDeleteOutfitLog } from '../../hooks/useOutfits'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 
 export default function HistoryEntry({ log, wardrobeItems }) {
   const { mutateAsync: updateLog } = useUpdateOutfitLog()
+  const { mutateAsync: deleteLog, isPending: isDeleting } = useDeleteOutfitLog()
   const { session } = useAuth()
   const [comment, setComment] = useState(log.comment ?? '')
   const [showRating, setShowRating] = useState(false)
   const [actionError, setActionError] = useState(null)
+  const [confirming, setConfirming] = useState(false)
+  const timerRef = useRef(null)
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+  }, [])
+
+  function handleDeleteClick() {
+    if (confirming) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+      setConfirming(false)
+      deleteLog(log.id).catch(() => setActionError('Could not remove. Try again.'))
+    } else {
+      setConfirming(true)
+      timerRef.current = setTimeout(() => {
+        setConfirming(false)
+        timerRef.current = null
+      }, 2000)
+    }
+  }
 
   const items = (log.item_ids ?? [])
     .map(id => wardrobeItems.find(w => w.id === id))
@@ -56,7 +78,7 @@ export default function HistoryEntry({ log, wardrobeItems }) {
   const isRated = log.rating !== null && log.rating !== undefined
 
   return (
-    <div className="bg-surface border border-border rounded-2xl p-4 space-y-3">
+    <div className="bg-surface card-shadow rounded-2xl p-4 space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-primary text-sm font-medium">{log.occasion}</p>
@@ -123,6 +145,22 @@ export default function HistoryEntry({ log, wardrobeItems }) {
           />
         </div>
       ) : null}
+
+      {/* Delete — unobtrusive; turns red only on confirm state */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className={`text-xs px-3 py-1 rounded-lg border transition-colors disabled:opacity-40 ${
+            confirming
+              ? 'border-red-900/40 text-red-400'
+              : 'border-transparent text-muted'
+          }`}
+        >
+          {isDeleting ? 'Removing...' : confirming ? 'Confirm delete' : 'Remove'}
+        </button>
+      </div>
     </div>
   )
 }

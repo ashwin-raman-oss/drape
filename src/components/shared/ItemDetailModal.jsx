@@ -63,9 +63,9 @@ export default function ItemDetailModal({ item, onClose }) {
         )}
       </div>
 
-      {/* Tag strip */}
+      {/* Tag strip — pb accounts for bottom nav + safe area so pills aren't obscured */}
       <div
-        className="flex-shrink-0 px-6 py-5 flex gap-2 flex-wrap"
+        className="flex-shrink-0 px-6 pt-5 pb-[calc(5rem+env(safe-area-inset-bottom))] flex gap-2 flex-wrap"
         onClick={e => e.stopPropagation()}
       >
         {tags.map((tag, i) => (

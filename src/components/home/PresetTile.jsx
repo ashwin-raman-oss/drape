@@ -1,12 +1,16 @@
-export default function PresetTile({ label, emoji, onTap }) {
+export default function PresetTile({ label, emoji, onTap, selected }) {
   return (
     <button
       type="button"
       onClick={() => onTap(label)}
-      className="bg-surface border border-border rounded-2xl p-4 text-left active:bg-border transition-colors"
+      className={`rounded-2xl py-4 px-3 text-left transition-colors ${
+        selected
+          ? 'bg-accent/15 border border-accent/40 text-accent'
+          : 'bg-surface-2 text-primary active:bg-border'
+      }`}
     >
       <span className="block text-xl mb-1">{emoji}</span>
-      <span className="text-sm text-primary leading-snug">{label}</span>
+      <span className="text-sm font-medium tracking-wide leading-snug">{label}</span>
     </button>
   )
 }

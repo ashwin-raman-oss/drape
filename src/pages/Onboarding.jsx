@@ -24,7 +24,7 @@ export default function Onboarding({ userId }) {
 
   return (
     <MobileLayout className="px-6 pt-16 pb-10">
-      <h1 className="text-2xl font-light text-primary mb-2">Your typical week</h1>
+      <h1 className="text-2xl font-serif font-light tracking-wide text-primary mb-2">Your typical week</h1>
       <p className="text-muted text-sm mb-8">
         Which of these are part of your life? Select all that apply — this shapes every recommendation.
       </p>

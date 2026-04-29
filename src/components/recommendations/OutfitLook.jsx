@@ -2,7 +2,7 @@ import ItemPhoto from './ItemPhoto'
 
 export default function OutfitLook({ lookNumber, items, reason, onSave, isSaving, isSaved }) {
   return (
-    <div className="bg-surface border border-border rounded-3xl p-5 space-y-4">
+    <div className="bg-surface card-shadow rounded-3xl p-5 space-y-4">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted tracking-widest uppercase">Look {lookNumber}</span>
       </div>
@@ -15,7 +15,7 @@ export default function OutfitLook({ lookNumber, items, reason, onSave, isSaving
       </div>
 
       {/* Reason */}
-      <p className="text-sm text-muted leading-relaxed">{reason}</p>
+      <p className="font-serif font-light italic text-base text-muted leading-relaxed">{reason}</p>
 
       {/* Save — persists to Saved ✓ once saved */}
       {isSaved ? (

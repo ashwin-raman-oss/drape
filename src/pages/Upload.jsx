@@ -146,7 +146,7 @@ export default function Upload() {
         {step === 1 ? '← Cancel' : '← Back'}
       </button>
 
-      <h1 className="text-2xl font-light text-primary mb-8">
+      <h1 className="text-2xl font-serif font-light tracking-wide text-primary mb-8">
         {step === 1 && 'Add item'}
         {step === 2 && 'Analysing...'}
         {step === 3 && 'Confirm details'}

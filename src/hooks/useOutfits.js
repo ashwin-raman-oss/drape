@@ -114,3 +114,20 @@ export function useDeleteSavedLook() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['saved_looks', session?.user?.id] }),
   })
 }
+
+export function useDeleteOutfitLog() {
+  const { session } = useAuth()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
+      const { error } = await supabase
+        .from('outfit_logs')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', session.user.id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outfit_logs', session?.user?.id] }),
+  })
+}

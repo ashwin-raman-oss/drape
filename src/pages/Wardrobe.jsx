@@ -33,7 +33,7 @@ export default function Wardrobe() {
     <MobileLayout className="pb-nav">
       <div className="px-6 pt-14 pb-4 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-light text-primary">Wardrobe</h1>
+          <h1 className="text-2xl font-serif font-light tracking-wide text-primary">Wardrobe</h1>
           <p className="text-muted text-sm">{activeCount} active items</p>
         </div>
         <button
@@ -48,7 +48,7 @@ export default function Wardrobe() {
       {/* Search bar */}
       <div className="px-6 mb-4 relative">
         <input
-          type="search"
+          type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by colour, brand or type…"
@@ -59,7 +59,7 @@ export default function Wardrobe() {
             type="button"
             aria-label="Clear search"
             onClick={() => setSearch('')}
-            className="absolute right-9 top-1/2 -translate-y-1/2 text-muted text-sm leading-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted text-sm leading-none"
           >
             ✕
           </button>

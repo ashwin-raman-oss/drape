@@ -118,7 +118,7 @@ export default function Recommendations() {
       <div className="px-6 pt-14 pb-4">
         <button type="button" aria-label="Go back" onClick={() => navigate(-1)} className="text-muted text-sm mb-6">← Back</button>
         <p className="text-muted text-xs tracking-widest uppercase mb-1">{occasion} · {weather}</p>
-        <h1 className="text-2xl font-light text-primary">Your looks</h1>
+        <h1 className="text-2xl font-serif font-light tracking-wide text-primary">Your looks</h1>
       </div>
 
       <div className="px-6 space-y-4 pb-6">

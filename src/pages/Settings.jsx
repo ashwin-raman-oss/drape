@@ -4,6 +4,8 @@ import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
 import LifestyleGrid from '../components/onboarding/LifestyleGrid'
 import { useProfile, useUpsertProfile } from '../hooks/useProfile'
+import { useAuth } from '../hooks/useAuth'
+import { useTheme } from '../hooks/useTheme'
 import { supabase } from '../lib/supabase'
 
 function UnsavedModal({ onLeave, onStay }) {
@@ -65,6 +67,8 @@ function UnsavedModal({ onLeave, onStay }) {
 
 export default function Settings({ userId }) {
   const navigate = useNavigate()
+  const { session } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const { data: profile } = useProfile(userId)
   const { mutateAsync: upsertProfile, isPending } = useUpsertProfile()
   const [selected, setSelected] = useState([])
@@ -117,12 +121,44 @@ export default function Settings({ userId }) {
     <>
       <MobileLayout className="pb-nav">
         <div className="px-6 pt-14 pb-4">
-          <h1 className="text-2xl font-light text-primary mb-1">Settings</h1>
+          <h1 className="text-2xl font-serif font-light tracking-wide text-primary mb-1">Settings</h1>
         </div>
 
         <div className="px-6 space-y-8 pb-6">
+          {/* Account */}
+          <div className="pb-6 border-b border-border">
+            <h2 className="text-xs text-muted tracking-widest uppercase mb-2">Account</h2>
+            <p className="text-primary text-sm">{session?.user?.email}</p>
+          </div>
+
+          {/* Appearance — theme toggle */}
+          <div className="pb-6 border-b border-border">
+            <h2 className="text-xs text-muted tracking-widest uppercase mb-3">Appearance</h2>
+            <div className="flex border border-border rounded-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => theme === 'dark' && toggleTheme()}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm transition-colors ${
+                  theme === 'light' ? 'text-accent border-r border-accent/40 bg-accent/10' : 'text-muted border-r border-border'
+                }`}
+              >
+                ☀️ Light
+              </button>
+              <button
+                type="button"
+                onClick={() => theme === 'light' && toggleTheme()}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm transition-colors ${
+                  theme === 'dark' ? 'text-accent bg-accent/10' : 'text-muted'
+                }`}
+              >
+                🌙 Dark
+              </button>
+            </div>
+          </div>
+
           <div>
-            <h2 className="text-xs text-muted tracking-widest uppercase mb-4">Lifestyle context</h2>
+            <h2 className="text-xs text-muted tracking-widest uppercase mb-2">Lifestyle context</h2>
+            <p className="text-muted text-sm mb-4">These selections tell Drape about your weekly life. They shape how Claude calibrates formality and occasion matching in every outfit recommendation. Update them whenever your routine changes.</p>
             <LifestyleGrid selected={selected} onChange={setSelected} />
             <button
               type="button"

@@ -32,7 +32,7 @@ export default function Auth() {
   if (signedUp) {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-3xl font-light tracking-widest mb-4 text-primary">DRAPE</h1>
+        <h1 className="font-serif font-light tracking-[0.3em] text-4xl text-primary mb-4">DRAPE</h1>
         <p className="text-primary mb-2">Check your email to confirm your account.</p>
         <p className="text-muted text-sm">Then come back here to sign in.</p>
         <button onClick={() => { setSignedUp(false); setMode('login') }} className="text-accent text-sm mt-8">
@@ -44,10 +44,10 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6">
-      <h1 className="text-3xl font-light tracking-widest mb-2 text-primary">DRAPE</h1>
-      <p className="text-muted text-sm mb-10">Your personal wardrobe, curated by AI.</p>
+      <h1 className="font-serif font-light tracking-[0.3em] text-4xl text-primary mb-2">DRAPE</h1>
+      <p className="font-serif font-light italic text-muted text-sm mb-10">Your personal wardrobe, curated by AI.</p>
 
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-6">
         <div>
           <label htmlFor="email" className="sr-only">Email address</label>
           <input
@@ -56,7 +56,7 @@ export default function Auth() {
             placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full bg-surface border border-border rounded-xl px-4 py-4 text-primary placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full bg-transparent border-0 border-b border-border px-0 py-4 text-primary placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
             required
           />
         </div>
@@ -68,7 +68,7 @@ export default function Auth() {
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="w-full bg-surface border border-border rounded-xl px-4 py-4 text-primary placeholder:text-muted focus:outline-none focus:border-accent"
+            className="w-full bg-transparent border-0 border-b border-border px-0 py-4 text-primary placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
             required
           />
         </div>
@@ -78,7 +78,7 @@ export default function Auth() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-accent text-bg py-4 rounded-xl font-medium tracking-wide disabled:opacity-50"
+          className="w-full bg-accent text-bg py-4 rounded-xl font-medium tracking-widest text-sm uppercase disabled:opacity-50"
         >
           {loading ? '...' : mode === 'login' ? 'Sign in' : 'Create account'}
         </button>

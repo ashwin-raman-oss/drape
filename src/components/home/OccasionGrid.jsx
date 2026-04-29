@@ -11,11 +11,17 @@ const PRESETS = [
   { label: 'Job interview',                 emoji: '🤝' },
 ]
 
-export default function OccasionGrid({ onSelect }) {
+export default function OccasionGrid({ onSelect, selected }) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {PRESETS.map(p => (
-        <PresetTile key={p.label} label={p.label} emoji={p.emoji} onTap={onSelect} />
+        <PresetTile
+          key={p.label}
+          label={p.label}
+          emoji={p.emoji}
+          onTap={onSelect}
+          selected={selected === p.label}
+        />
       ))}
     </div>
   )

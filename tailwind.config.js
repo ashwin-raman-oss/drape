@@ -14,17 +14,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg:       '#0A0A0A',
-        surface:  '#141414',
-        border:   '#1F1F1F',
-        muted:    '#888888',
-        accent:   '#C9A96E',
-        primary:  '#F5F5F5',
+        bg:             'var(--bg)',
+        surface:        'var(--surface)',
+        'surface-2':    'var(--surface-2)',
+        border:         'var(--border)',
+        primary:        'var(--primary)',
+        muted:          'var(--muted)',
+        // accent uses RGB channels so opacity modifiers (bg-accent/15) work
+        accent:         'rgb(var(--accent) / <alpha-value>)',
+        'accent-hover': 'var(--accent-hover)',
+        error:          'var(--error)',
+        warning:        'var(--warning)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:  ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.card-shadow': {
+          'box-shadow': 'var(--card-shadow)',
+        },
+      })
+    },
+  ],
 }

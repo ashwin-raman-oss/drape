@@ -30,12 +30,12 @@ export default function Home() {
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
         <p className="text-muted text-xs tracking-widest uppercase mb-1">Good morning</p>
-        <h1 className="text-2xl font-light text-primary">What's the occasion?</h1>
+        <h1 className="text-2xl font-serif font-light tracking-wide text-primary">What's the occasion?</h1>
       </div>
 
       {/* Preset grid */}
       <div className="px-6 mb-6">
-        <OccasionGrid onSelect={handlePreset} />
+        <OccasionGrid onSelect={handlePreset} selected={text} />
       </div>
 
       {/* Free text input */}

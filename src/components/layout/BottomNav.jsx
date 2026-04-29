@@ -10,7 +10,7 @@ const tabs = [
 
 export default function BottomNav({ onNavAttempt }) {
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface border-t border-border flex safe-bottom">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface border-t border-border flex safe-bottom h-16">
       {tabs.map(tab => {
         if (onNavAttempt) {
           return (
@@ -18,11 +18,11 @@ export default function BottomNav({ onNavAttempt }) {
               key={tab.to}
               type="button"
               onClick={() => onNavAttempt(tab.to)}
-              className="flex-1 flex flex-col items-center pt-1 pb-3 gap-1 text-xs text-muted relative"
+              className="flex-1 flex flex-col items-center justify-center gap-1 text-muted relative"
             >
-              <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-transparent" />
-              <span className="text-lg leading-none mt-1">{tab.icon}</span>
-              <span>{tab.label}</span>
+              <span className="absolute top-0 left-0 right-0 h-px bg-transparent" />
+              <span className="text-lg leading-none">{tab.icon}</span>
+              <span className="text-[10px] tracking-widest uppercase font-medium">{tab.label}</span>
             </button>
           )
         }
@@ -33,7 +33,7 @@ export default function BottomNav({ onNavAttempt }) {
             to={tab.to}
             end={tab.to === '/'}
             className={({ isActive }) =>
-              `flex-1 flex flex-col items-center pt-1 pb-3 gap-1 text-xs transition-colors relative ${
+              `flex-1 flex flex-col items-center justify-center gap-1 transition-colors relative ${
                 isActive ? 'text-accent' : 'text-muted'
               }`
             }
@@ -41,12 +41,12 @@ export default function BottomNav({ onNavAttempt }) {
             {({ isActive }) => (
               <>
                 <span
-                  className={`absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full transition-all ${
+                  className={`absolute top-0 left-0 right-0 h-px transition-all ${
                     isActive ? 'bg-accent' : 'bg-transparent'
                   }`}
                 />
-                <span className="text-lg leading-none mt-1">{tab.icon}</span>
-                <span>{tab.label}</span>
+                <span className="text-lg leading-none">{tab.icon}</span>
+                <span className="text-[10px] tracking-widest uppercase font-medium">{tab.label}</span>
               </>
             )}
           </NavLink>

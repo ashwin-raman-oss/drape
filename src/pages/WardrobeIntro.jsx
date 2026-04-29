@@ -8,7 +8,7 @@ export default function WardrobeIntro() {
     <MobileLayout className="px-6 pt-20 pb-10 flex flex-col">
       <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4">
         <p className="text-4xl" aria-hidden="true">👔</p>
-        <h1 className="text-2xl font-light text-primary">You're all set.</h1>
+        <h1 className="text-2xl font-serif font-light tracking-wide text-primary">You're all set.</h1>
         <p className="text-muted text-sm leading-relaxed max-w-xs">
           Now let's build your wardrobe. Add your first piece of clothing so Drape can start recommending outfits.
         </p>

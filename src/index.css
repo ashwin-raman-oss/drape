@@ -2,12 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+
+/* Dark mode (default) */
+:root {
+  --bg:           #080808;
+  --surface:      #111111;
+  --surface-2:    #1A1A1A;
+  --border:       #2A2A2A;
+  --primary:      #F5F5F0;
+  --muted:        #707070;
+  /* accent as RGB channels so Tailwind opacity modifiers work (bg-accent/15 etc.) */
+  --accent:       201 169 110;
+  --accent-hover: #B8945A;
+  --error:        #E57373;
+  --warning:      #F0A500;
+  --card-shadow:  0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --bg:           #FAFAF8;
+  --surface:      #FFFFFF;
+  --surface-2:    #F4F2EE;
+  --border:       #E8E4DC;
+  --primary:      #1A1A1A;
+  --muted:        #8A8680;
+  --accent:       139 111 71;
+  --accent-hover: #7A5F3A;
+  --error:        #C0392B;
+  --warning:      #D4890A;
+  --card-shadow:  0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+
 @layer base {
   body {
-    @apply bg-bg text-primary min-h-screen;
+    @apply bg-bg text-primary min-h-screen font-sans;
     -webkit-tap-highlight-color: transparent;
   }
 }
+
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
 
 @layer utilities {
   .safe-bottom {

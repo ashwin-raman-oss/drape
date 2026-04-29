@@ -32,7 +32,7 @@ export default function Weather() {
       <button type="button" onClick={() => navigate(-1)} className="text-muted text-sm mb-8">← Back</button>
 
       <p className="text-muted text-xs tracking-widest uppercase mb-1">{occasion}</p>
-      <h1 className="text-2xl font-light text-primary mb-10">What's the weather like?</h1>
+      <h1 className="text-2xl font-serif font-light tracking-wide text-primary mb-10">What's the weather like?</h1>
 
       <div className="grid grid-cols-2 gap-4">
         {WEATHER_OPTIONS.map(opt => (

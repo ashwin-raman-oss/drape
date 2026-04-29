@@ -32,7 +32,7 @@ function SavedLookCard({ look, items, onDelete, isDeleting }) {
 
   return (
     <>
-    <div className="bg-surface border border-border rounded-3xl p-5 space-y-3">
+    <div className="bg-surface card-shadow rounded-3xl p-5 space-y-3">
       <div>
         <p className="text-primary text-sm font-medium">{look.occasion}</p>
         <p className="text-muted text-xs">{look.weather} · {new Date(look.created_at).toLocaleDateString()}</p>
@@ -95,7 +95,7 @@ export default function Saved() {
   return (
     <MobileLayout className="pb-nav">
       <div className="px-6 pt-14 pb-4">
-        <h1 className="text-2xl font-light text-primary">Saved looks</h1>
+        <h1 className="text-2xl font-serif font-light tracking-wide text-primary">Saved looks</h1>
         <p className="text-muted text-sm">Outfits you've saved from recommendations.</p>
       </div>
 
