@@ -100,7 +100,7 @@ export default function ItemDetail({ item, onClose }) {
         aria-modal="true"
         aria-label={item.item_type}
         onKeyDown={handleKeyDown}
-        className="fixed inset-0 bg-bg/95 z-50 overflow-y-auto"
+        className="fixed inset-0 bg-surface z-50 overflow-y-auto"
       >
         <div className="max-w-md mx-auto px-6 pt-6 pb-10">
           <button
