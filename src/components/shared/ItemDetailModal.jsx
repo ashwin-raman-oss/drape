@@ -62,7 +62,7 @@ export default function ItemDetailModal({ item, onClose }) {
             {tags.map((tag, i) => (
               <span
                 key={i}
-                className="flex-shrink-0 bg-surface/80 backdrop-blur-sm text-primary text-xs px-3 py-1 rounded-full"
+                className="flex-shrink-0 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full"
               >
                 {tag}
               </span>
