@@ -154,25 +154,37 @@ Run the following in the Supabase SQL Editor, in order:
 
 ## Roadmap
 
-These are the post-MVP features worth building next, in rough priority order.
+These are the features worth building next, in priority order.
 
-**Feedback loop nudges**
-A proactive prompt to return and rate an outfit after wearing it, closing the loop that makes recommendations improve over time.
+**Near-term**
 
-**Partner / share mode**
-Send a look to someone for a second opinion before you commit to it. Useful for anyone who wants a sanity check on a big meeting outfit or a first date.
+Travel and event packing planner
+Input a destination, trip duration, and planned activities. Drape builds a complete packing list from your actual wardrobe — outfits per day, accounting for weather and occasion mix. The data model already supports this. It is the most natural extension of the daily recommendation flow.
 
-**Event and travel planner**
-Input a trip or multi-day event and get a full packing list built from your actual wardrobe. "Pack for 5 days in Milan in October" is a solvable problem with the data already in the system.
+Accessories category
+Belts, watches, bags, and scarves added as a dedicated category with their own tagging schema and recommendation logic. Rounds out the outfit picture Drape can build.
 
-**Wardrobe gap analysis**
-Show the user what categories they own nothing in, what they consistently avoid wearing, and what a single purchase would unlock in terms of new combinations. This turns Drape from a daily tool into a shopping advisor.
+Care and upkeep suggestions
+Before recommending an outfit, Drape flags any upkeep the item needs. Lint roll the black sweater. Steam the button-down. Iron the suit. Generated from the item's material and condition data — no extra input required from the user.
 
-**Weather auto-detect**
-Pull current conditions from a weather API based on location rather than requiring manual input. The 4-condition model stays. The user just stops having to tap it every morning.
+**Medium-term**
 
-**Athletic wear category**
-A separate wardrobe section and occasion set for gym, running, and active use. Different tagging schema, different recommendation logic.
+Wear and tear detection
+Claude vision assesses condition from the upload photo — pilling, fading, fraying. Newness becomes a recommendation criterion. Drape learns to save pristine pieces for the right moments and lean on everyday workhorses for casual use.
+
+Wardrobe gap analysis
+After a month of usage, Drape surfaces what you consistently avoid wearing, what categories you own nothing in, and what a single purchase would unlock across your existing wardrobe. Turns the app from a daily tool into a genuine shopping advisor.
+
+Photo performance refactor
+As wardrobes grow beyond 50 items, image loading becomes the primary performance bottleneck. Progressive loading, lazy rendering, and client-side caching to keep the experience fast at scale.
+
+**Ambitious**
+
+Video cataloguing
+Record a slow pan across your wardrobe. AI extracts individual items frame by frame, identifies each one, and creates wardrobe entries automatically — with a confirmation step for anything it is not confident about. Eliminates the one-by-one upload process entirely. No competitor has solved this well.
+
+Partner share mode
+Send a look to someone for a quick vote before you commit. Useful for the "does this work?" moment that currently requires holding up clothes in front of another person.
 
 ---
 
