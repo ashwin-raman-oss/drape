@@ -49,7 +49,7 @@ Deleting a wardrobe item would corrupt the history of any outfit it appeared in.
 A recommendation engine with no data is useless. Rather than launching to an empty wardrobe and asking users to wait, onboarding collects lifestyle context upfront: formality of work, how often you go out, personal style, climate. The first recommendation is informed even before the first item is uploaded.
 
 **Rotation logic on tops only — 6-day rolling window**
-Tops are the most visible and most memorable piece of any outfit. Trousers and shoes can repeat without anyone noticing. Tops marked as worn are deprioritised for 6 days from the wear date. Bottoms, shoes, and outer layers can repeat freely.
+Tops are the most visible part of any outfit. When you mark an outfit as worn, Drape writes the wear date back to each item in that outfit. Tops worn in the last 6 days are flagged in the recommendation prompt and excluded unless the wardrobe has no valid alternatives. Bottoms, shoes, and outer layers can repeat freely — nobody notices.
 
 **Specific errors over generic ones**
 Every failure mode in the recommendation flow surfaces a distinct, actionable message. Generic errors erode trust; specific ones give users something to act on.
@@ -86,6 +86,10 @@ When you request an outfit, the app assembles a context payload: your occasion a
 - Unsaved changes warning in Settings — navigating away with unsaved lifestyle changes prompts a confirmation
 - Full wardrobe management: edit tags, archive, restore, and delete items
 - PWA: installable on your phone home screen, works without an app store
+- Wardrobe search — filter your wardrobe instantly by colour, brand, item type or style notes. Search and category filter work together.
+- Photo lightbox — tap any clothing photo in recommendations or saved looks to see a full-screen view with brand, colour, formality and item type overlaid.
+- Delete saved looks — remove looks from your saved collection with a two-tap confirmation.
+- Rotation now fully wired — when you mark an outfit as worn, last_worn_at is written back to each wardrobe item, activating the 6-day rotation window for tops.
 
 ---
 
@@ -115,6 +119,9 @@ Photos taken on a modern phone are between 3MB and 8MB. The Anthropic API has a 
 
 **Zustand for flow state, TanStack Query for server state**
 The recommendation flow has several transient UI steps: occasion selection, weather selection, loading, and results. That state doesn't belong in the server cache. Zustand handles the in-session flow state cleanly. TanStack Query handles everything that lives in Supabase: wardrobe items, outfits, history. Mixing the two in one place would have been messy and harder to debug.
+
+**Wear date written at log time, not upload time**
+When a user marks an outfit as worn, last_worn_at is updated on every wardrobe item in that outfit in a single batched Supabase call. This keeps the rotation logic data-driven rather than prompt-driven, and ensures the flag fires reliably on every subsequent recommendation.
 
 ---
 
