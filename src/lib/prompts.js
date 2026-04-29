@@ -20,7 +20,7 @@ Example output (do not copy these values — analyse the actual images):
 }
 
 // Builds the Claude prompt for outfit recommendations
-export function buildRecommendationPrompt({ occasion, weather, lifestyleContext, wardrobeItems, recentRatings }) {
+export function buildRecommendationPrompt({ occasion, weather, lifestyleContext, wardrobeItems, recentRatings, wardrobeMap }) {
   const recentlyWornIds = wardrobeItems
     .filter(item => {
       if (!item.last_worn_at) return false
@@ -40,8 +40,16 @@ export function buildRecommendationPrompt({ occasion, weather, lifestyleContext,
   const ratingsText = recentRatings.length
     ? recentRatings.map(r => {
         const safeComment = (r.comment ?? '').replace(/[\r\n]/g, ' ').slice(0, 200)
-        return `Occasion: ${r.occasion}, Weather: ${r.weather}, Rating: ${r.rating === 1 ? '👍' : '👎'}${r.comment ? `, Comment: ${safeComment}` : ''}`
-      }).join('\n')
+        const itemNames = (r.item_ids ?? [])
+          .map(id => wardrobeMap?.get(id))
+          .filter(Boolean)
+          .map(item => `${item.colour} ${item.item_type}`)
+          .join(', ')
+        const lines = [`Occasion: ${r.occasion}, Weather: ${r.weather}, Rating: ${r.rating === 1 ? '👍' : '👎'}`]
+        if (itemNames) lines.push(`Items worn: ${itemNames}`)
+        if (safeComment) lines.push(`Comment: ${safeComment}`)
+        return lines.join('\n')
+      }).join('\n\n')
     : 'No ratings yet.'
 
   return `You are a personal stylist AI. Recommend exactly 2 complete outfit looks from the wardrobe below.
@@ -60,7 +68,7 @@ Rules:
 - Each look needs at least a Top, Bottom, and Shoes. Add Outer layer if weather warrants it.
 - Strongly prefer items that have NOT been worn in the last 7 days, especially Tops.
 - Match formality to occasion. Respect weather.
-- Learn from the feedback history — avoid repeating combinations that got 👎.
+- Learn from the feedback history — avoid repeating specific item combinations that got 👎, and note which combinations and occasions earned 👍 to inform similar future requests.
 
 Return ONLY a valid JSON array with exactly 2 objects:
 [

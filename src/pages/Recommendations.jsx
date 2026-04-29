@@ -61,6 +61,7 @@ export default function Recommendations() {
         lifestyleContext: profile?.lifestyle_context ?? [],
         wardrobeItems: wardrobe,
         recentRatings,
+        wardrobeMap: wardrobeById,
       })
 
       const response = await callClaude({
