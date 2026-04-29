@@ -23,6 +23,7 @@ Example output (do not copy these values — analyse the actual images):
 export function buildRecommendationPrompt({ occasion, weather, lifestyleContext, wardrobeItems, recentRatings, wardrobeMap }) {
   const recentlyWornIds = wardrobeItems
     .filter(item => {
+      if (item.category !== 'Top') return false
       if (!item.last_worn_at) return false
       const daysSince = (Date.now() - new Date(item.last_worn_at)) / 86400000
       return daysSince < 7
@@ -66,7 +67,7 @@ ${itemsText}
 
 Rules:
 - Each look needs at least a Top, Bottom, and Shoes. Add Outer layer if weather warrants it.
-- Strongly prefer items that have NOT been worn in the last 7 days, especially Tops.
+- Tops marked [RECENTLY WORN — deprioritise] have been worn in the last 6 days — do not include them in recommendations unless the wardrobe has no valid alternatives for the requested occasion.
 - Match formality to occasion. Respect weather.
 - Learn from the feedback history — avoid repeating specific item combinations that got 👎, and note which combinations and occasions earned 👍 to inform similar future requests.
 

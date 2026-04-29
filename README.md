@@ -48,8 +48,8 @@ Deleting a wardrobe item would corrupt the history of any outfit it appeared in.
 **Lifestyle onboarding to solve cold start**
 A recommendation engine with no data is useless. Rather than launching to an empty wardrobe and asking users to wait, onboarding collects lifestyle context upfront: formality of work, how often you go out, personal style, climate. The first recommendation is informed even before the first item is uploaded.
 
-**Rotation logic on tops only, 7-day window**
-Tops are the most visible and most memorable piece of any outfit. Trousers and shoes can repeat without anyone noticing. Tracking recency on tops within a rolling 7-day window prevents visible repetition without being so restrictive it limits valid options.
+**Rotation logic on tops only — 6-day rolling window**
+Tops are the most visible and most memorable piece of any outfit. Trousers and shoes can repeat without anyone noticing. Tops marked as worn are deprioritised for 6 days from the wear date. Bottoms, shoes, and outer layers can repeat freely.
 
 **Specific errors over generic ones**
 Every failure mode in the recommendation flow surfaces a distinct, actionable message. Generic errors erode trust; specific ones give users something to act on.

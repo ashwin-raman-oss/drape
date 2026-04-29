@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { useUpdateOutfitLog } from '../../hooks/useOutfits'
+import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 
 export default function HistoryEntry({ log, wardrobeItems }) {
   const { mutateAsync: updateLog } = useUpdateOutfitLog()
+  const { session } = useAuth()
   const [comment, setComment] = useState(log.comment ?? '')
   const [showRating, setShowRating] = useState(false)
   const [actionError, setActionError] = useState(null)
@@ -14,7 +17,19 @@ export default function HistoryEntry({ log, wardrobeItems }) {
   async function markWorn() {
     setActionError(null)
     try {
-      await updateLog({ id: log.id, worn_at: new Date().toISOString() })
+      const wornAt = new Date().toISOString()
+      await updateLog({ id: log.id, worn_at: wornAt })
+
+      // Backfill last_worn_at on each wardrobe item in this outfit
+      const itemIds = log.item_ids ?? []
+      if (itemIds.length > 0 && session?.user?.id) {
+        await supabase
+          .from('wardrobe_items')
+          .update({ last_worn_at: wornAt })
+          .in('id', itemIds)
+          .eq('user_id', session.user.id)
+      }
+
       setShowRating(true)
     } catch {
       setActionError('Could not update. Try again.')
