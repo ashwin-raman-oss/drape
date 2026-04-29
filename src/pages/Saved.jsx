@@ -4,9 +4,11 @@ import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
 import { useSavedLooks, useDeleteSavedLook } from '../hooks/useOutfits'
 import { useWardrobe } from '../hooks/useWardrobe'
+import ItemDetailModal from '../components/shared/ItemDetailModal'
 
 function SavedLookCard({ look, items, onDelete, isDeleting }) {
   const [confirming, setConfirming] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(null)
   const timerRef = useRef(null)
 
   useEffect(() => {
@@ -29,6 +31,7 @@ function SavedLookCard({ look, items, onDelete, isDeleting }) {
   }
 
   return (
+    <>
     <div className="bg-surface border border-border rounded-3xl p-5 space-y-3">
       <div>
         <p className="text-primary text-sm font-medium">{look.occasion}</p>
@@ -38,7 +41,11 @@ function SavedLookCard({ look, items, onDelete, isDeleting }) {
       {/* Item thumbnails — horizontal scroll */}
       <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
         {items.map(item => (
-          <div key={item.id} className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div
+            key={item.id}
+            className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer"
+            onClick={() => setSelectedItem(item)}
+          >
             <div className="w-20 h-28 rounded-2xl overflow-hidden bg-bg border border-border">
               {item.image_url ? (
                 <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
@@ -69,6 +76,11 @@ function SavedLookCard({ look, items, onDelete, isDeleting }) {
         </button>
       </div>
     </div>
+
+    {selectedItem && (
+      <ItemDetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />
+    )}
+    </>
   )
 }
 
