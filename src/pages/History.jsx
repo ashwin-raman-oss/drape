@@ -15,7 +15,7 @@ export default function History() {
         <p className="text-muted text-sm">Your outfit decisions over time.</p>
       </div>
 
-      <div className="px-6 space-y-3 pb-6">
+      <div className="px-6 pb-6">
         {isLoading && <p className="text-muted text-sm text-center py-10">Loading...</p>}
         {!isLoading && !logs.length && (
           <p className="text-muted text-sm text-center py-10">No outfits logged yet.</p>

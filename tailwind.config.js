@@ -20,7 +20,9 @@ export default {
         border:         'var(--border)',
         primary:        'var(--primary)',
         muted:          'var(--muted)',
-        // accent uses RGB channels so opacity modifiers (bg-accent/15) work
+        // These three use RGB channels so opacity modifiers work (bg-accent/15, border-border/30, bg-surface/80)
+        surface:        'rgb(var(--surface) / <alpha-value>)',
+        border:         'rgb(var(--border) / <alpha-value>)',
         accent:         'rgb(var(--accent) / <alpha-value>)',
         'accent-hover': 'var(--accent-hover)',
         error:          'var(--error)',

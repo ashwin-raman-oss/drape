@@ -6,45 +6,48 @@ function PhotoSlot({ file, label, description, cameraRef, galleryRef }) {
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview) }, [preview])
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="aspect-[3/4] rounded-3xl border-2 border-dashed border-border bg-surface overflow-hidden flex flex-col items-center justify-center">
+    <div className="flex flex-col gap-3">
+      <div className="aspect-[3/4] rounded-2xl border-2 border-border bg-surface-2 overflow-hidden flex flex-col items-center justify-center">
         {preview ? (
           <img src={preview} alt={label} className="w-full h-full object-cover" />
         ) : (
-          <div className="flex flex-col items-center gap-3 px-3 py-5 text-center w-full">
-            <span className="text-sm text-primary font-medium">{label}</span>
+          <div className="flex flex-col items-center gap-3 px-6 py-8 text-center w-full">
+            <span className="text-4xl text-muted">+</span>
+            <span className="font-serif font-light text-xl text-primary">{label}</span>
             <span className="text-xs text-muted">{description}</span>
-            <button
-              type="button"
-              onClick={() => cameraRef.current.click()}
-              className="w-full border border-border text-muted text-xs py-2 rounded-xl transition-colors active:border-accent active:text-accent"
-            >
-              Take photo
-            </button>
-            <button
-              type="button"
-              onClick={() => galleryRef.current.click()}
-              className="w-full border border-border text-muted text-xs py-2 rounded-xl transition-colors active:border-accent active:text-accent"
-            >
-              Choose from gallery
-            </button>
+            <div className="flex flex-col gap-2 mt-1 w-full">
+              <button
+                type="button"
+                onClick={() => cameraRef.current.click()}
+                className="text-accent text-sm underline-offset-4 hover:underline"
+              >
+                Take photo
+              </button>
+              <button
+                type="button"
+                onClick={() => galleryRef.current.click()}
+                className="text-accent text-sm underline-offset-4 hover:underline"
+              >
+                Choose from gallery
+              </button>
+            </div>
           </div>
         )}
       </div>
 
       {preview && (
-        <div className="flex gap-1">
+        <div className="flex gap-4 justify-center">
           <button
             type="button"
             onClick={() => cameraRef.current.click()}
-            className="flex-1 border border-border text-muted text-xs py-2 rounded-xl transition-colors active:border-accent active:text-accent"
+            className="text-accent text-sm underline-offset-4 hover:underline"
           >
             Retake
           </button>
           <button
             type="button"
             onClick={() => galleryRef.current.click()}
-            className="flex-1 border border-border text-muted text-xs py-2 rounded-xl transition-colors active:border-accent active:text-accent"
+            className="text-accent text-sm underline-offset-4 hover:underline"
           >
             Gallery
           </button>
@@ -74,7 +77,7 @@ export default function UploadStep1({ itemPhoto, labelPhoto, onItemPhoto, onLabe
       <input ref={labelCameraRef}  type="file" accept="image/*" capture="environment" className="hidden" onChange={e => handleFile(e, onLabelPhoto)} />
       <input ref={labelGalleryRef} type="file" accept="image/*" className="hidden"                       onChange={e => handleFile(e, onLabelPhoto)} />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-6">
         <PhotoSlot
           file={itemPhoto}
           label="Item photo"
@@ -95,7 +98,7 @@ export default function UploadStep1({ itemPhoto, labelPhoto, onItemPhoto, onLabe
         type="button"
         onClick={onNext}
         disabled={!itemPhoto}
-        className="w-full bg-accent text-bg py-4 rounded-2xl font-medium tracking-wide disabled:opacity-40"
+        className="w-full bg-accent text-bg py-4 rounded-2xl font-medium tracking-widest text-sm uppercase disabled:opacity-40"
       >
         Tag with AI
       </button>

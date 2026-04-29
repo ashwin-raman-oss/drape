@@ -11,7 +11,7 @@ export default function WardrobeGrid({ items = [], onItemClick }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-4">
       {items.map(item => (
         <ItemCard key={item.id} item={item} onClick={() => onItemClick(item)} />
       ))}

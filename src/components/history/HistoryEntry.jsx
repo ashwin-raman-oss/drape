@@ -78,39 +78,43 @@ export default function HistoryEntry({ log, wardrobeItems }) {
   const isRated = log.rating !== null && log.rating !== undefined
 
   return (
-    <div className="bg-surface card-shadow rounded-2xl p-4 space-y-3">
+    <div className="py-5 border-b border-border/30">
+      {/* Header row — dateline + occasion + action */}
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-primary text-sm font-medium">{log.occasion}</p>
-          <p className="text-muted text-xs">{log.weather} · {new Date(log.created_at).toLocaleDateString()}</p>
+          <p className="text-xs tracking-widest uppercase text-muted font-medium mb-1">
+            {new Date(log.created_at).toLocaleDateString()}
+          </p>
+          <p className="font-serif text-lg font-light text-primary">{log.occasion}</p>
+          <p className="text-xs text-muted mt-0.5">{log.weather}</p>
         </div>
 
-        {!isWorn && (
-          <button type="button" onClick={markWorn} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg flex-shrink-0">
-            Mark worn
-          </button>
-        )}
-        {isWorn && !isRated && !showRating && (
-          <button type="button" onClick={() => setShowRating(true)} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg flex-shrink-0">
-            Rate this look
-          </button>
-        )}
-        {isWorn && isRated && (
-          <span className="text-xs text-muted border border-border px-2 py-1 rounded-lg flex-shrink-0">
-            {log.rating === 1 ? '👍' : '👎'}
-          </span>
-        )}
+        <div className="flex-shrink-0">
+          {!isWorn && (
+            <button type="button" onClick={markWorn} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg">
+              Mark worn
+            </button>
+          )}
+          {isWorn && !isRated && !showRating && (
+            <button type="button" onClick={() => setShowRating(true)} className="text-xs text-accent border border-accent px-3 py-1 rounded-lg">
+              Rate this look
+            </button>
+          )}
+          {isWorn && isRated && (
+            <span className="text-2xl">{log.rating === 1 ? '👍' : '👎'}</span>
+          )}
+        </div>
       </div>
 
       {/* Item thumbnails */}
       {items.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide mt-3">
           {items.map(item => (
-            <div key={item.id} className="w-14 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border">
+            <div key={item.id} className="w-14 h-24 rounded-2xl overflow-hidden flex-shrink-0 border border-border">
               {item.image_url ? (
                 <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-surface">
+                <div className="w-full h-full flex items-center justify-center bg-surface-2">
                   <span className="text-muted text-[10px]">—</span>
                 </div>
               )}
@@ -119,11 +123,11 @@ export default function HistoryEntry({ log, wardrobeItems }) {
         </div>
       )}
 
-      {actionError && <p className="text-red-400 text-xs">{actionError}</p>}
+      {actionError && <p className="text-red-400 text-xs mt-2">{actionError}</p>}
 
       {/* Rating form — shown after mark worn or tapping Rate this look */}
       {(isWorn && showRating) || (isWorn && isRated) ? (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-3">
           {[{ val: 1, emoji: '👍' }, { val: -1, emoji: '👎' }].map(({ val, emoji }) => (
             <button
               key={val}
@@ -147,7 +151,7 @@ export default function HistoryEntry({ log, wardrobeItems }) {
       ) : null}
 
       {/* Delete — unobtrusive; turns red only on confirm state */}
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-3">
         <button
           type="button"
           onClick={handleDeleteClick}

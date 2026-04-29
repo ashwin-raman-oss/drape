@@ -6,9 +6,9 @@ export default function ItemPhoto({ item }) {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-2 w-32 flex-shrink-0">
+      <div className="flex flex-col items-center gap-0 w-36 flex-shrink-0">
         <div
-          className="w-32 h-40 rounded-2xl overflow-hidden bg-surface border border-border flex items-center justify-center cursor-pointer"
+          className="w-36 h-48 rounded-2xl overflow-hidden bg-surface-2 card-shadow flex items-center justify-center cursor-pointer"
           onClick={() => setOpen(true)}
         >
           {item.image_url ? (
@@ -21,7 +21,7 @@ export default function ItemPhoto({ item }) {
             <span className="text-muted text-xs text-center px-2">No photo</span>
           )}
         </div>
-        <p className="text-xs text-muted text-center leading-tight px-1">{item.item_type}</p>
+        <p className="text-xs text-muted font-light leading-tight truncate mt-2 w-36 text-center px-1">{item.item_type}</p>
       </div>
 
       {open && <ItemDetailModal item={item} onClose={() => setOpen(false)} />}

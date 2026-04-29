@@ -29,8 +29,8 @@ export default function Home() {
     <MobileLayout className="pb-nav">
       {/* Header */}
       <div className="px-6 pt-14 pb-6">
-        <p className="text-muted text-xs tracking-widest uppercase mb-1">Good morning</p>
-        <h1 className="text-2xl font-serif font-light tracking-wide text-primary">What's the occasion?</h1>
+        <p className="text-muted text-sm tracking-widest uppercase font-medium mb-1">Good morning</p>
+        <h1 className="font-serif text-3xl font-light leading-tight text-primary">What's the occasion?</h1>
       </div>
 
       {/* Preset grid */}
@@ -45,7 +45,7 @@ export default function Home() {
           onChange={e => setText(e.target.value)}
           placeholder="Or describe it yourself..."
           rows={2}
-          className="w-full bg-surface border border-border rounded-2xl px-4 py-4 text-primary placeholder:text-muted text-sm resize-none focus:outline-none focus:border-accent"
+          className="w-full bg-transparent border-0 border-b border-border px-0 py-4 text-base font-light text-primary placeholder:text-muted resize-none focus:outline-none focus:border-accent transition-colors"
           aria-label="Occasion description"
         />
       </div>
@@ -58,7 +58,7 @@ export default function Home() {
           type="button"
           onClick={handleContinue}
           disabled={!text.trim()}
-          className="w-full bg-accent text-bg py-4 rounded-2xl font-medium tracking-wide disabled:opacity-40"
+          className="w-full bg-accent text-bg py-4 rounded-2xl text-sm font-medium tracking-widest uppercase disabled:opacity-40"
         >
           Next
         </button>

@@ -32,48 +32,45 @@ function SavedLookCard({ look, items, onDelete, isDeleting }) {
 
   return (
     <>
-    <div className="bg-surface card-shadow rounded-3xl p-5 space-y-3">
-      <div>
-        <p className="text-primary text-sm font-medium">{look.occasion}</p>
-        <p className="text-muted text-xs">{look.weather} · {new Date(look.created_at).toLocaleDateString()}</p>
+    <div className="py-5 border-b border-border/30 relative">
+      {/* ✕ delete — top-right, two-tap confirmation */}
+      <button
+        type="button"
+        onClick={handleDeleteClick}
+        disabled={isDeleting}
+        className={`absolute top-5 right-0 text-xs transition-colors disabled:opacity-40 ${
+          confirming ? 'text-red-400' : 'text-muted'
+        }`}
+      >
+        {isDeleting ? '…' : confirming ? 'Confirm' : '✕'}
+      </button>
+
+      {/* Header */}
+      <div className="pr-8">
+        <p className="text-xs tracking-widest uppercase text-muted font-medium mb-1">
+          {new Date(look.created_at).toLocaleDateString()}
+        </p>
+        <p className="font-serif text-lg font-light text-primary">{look.occasion}</p>
+        <p className="text-xs text-muted mt-0.5">{look.weather}</p>
       </div>
 
       {/* Item thumbnails — horizontal scroll */}
-      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide mt-3">
         {items.map(item => (
           <div
             key={item.id}
-            className="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer"
+            className="w-14 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-surface-2 cursor-pointer"
             onClick={() => setSelectedItem(item)}
           >
-            <div className="w-20 h-28 rounded-2xl overflow-hidden bg-bg border border-border">
-              {item.image_url ? (
-                <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-muted text-xs">—</span>
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-muted text-center w-20 truncate">{item.item_type}</p>
+            {item.image_url ? (
+              <img src={item.image_url} alt={item.item_type} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-muted text-[10px]">—</span>
+              </div>
+            )}
           </div>
         ))}
-      </div>
-
-      {/* Delete — unobtrusive, bottom right; turns red only on confirm state */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-          className={`text-xs px-3 py-1 rounded-lg border transition-colors disabled:opacity-40 ${
-            confirming
-              ? 'border-red-900/40 text-red-400'
-              : 'border-transparent text-muted'
-          }`}
-        >
-          {isDeleting ? 'Removing...' : confirming ? 'Confirm delete' : 'Remove'}
-        </button>
       </div>
     </div>
 
@@ -99,7 +96,7 @@ export default function Saved() {
         <p className="text-muted text-sm">Outfits you've saved from recommendations.</p>
       </div>
 
-      <div className="px-6 space-y-4 pb-6">
+      <div className="px-6 pb-6">
         {isLoading && (
           <div className="flex justify-center py-16">
             <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
