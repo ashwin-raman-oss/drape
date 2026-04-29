@@ -75,7 +75,7 @@ When you request an outfit, the app assembles a context payload: your occasion a
 - Weather context across 4 conditions: hot, warm, cool, cold
 - Lifestyle onboarding to solve cold start and personalise from day one
 - Rotation logic that deprioritises tops worn in the last 7 days
-- Feedback loop: thumbs up or down plus optional comment on every recommendation
+- Feedback loop: thumbs up or down plus optional comment — rated outfits include specific item combinations so Claude learns at the combination level, not just occasion level
 - Wear logging with date stamps
 - Outfit history, browsable by month
 - Saved looks for outfits you want to revisit
