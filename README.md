@@ -70,26 +70,21 @@ When you request an outfit, the app assembles a context payload: your occasion a
 
 ## Features
 
-- Wardrobe upload with Claude vision auto-tagging (2 photos per item)
-- Occasion-driven outfit recommendations with 8 preset occasions and free text
-- Weather context across 4 conditions: hot, warm, cool, cold
-- Lifestyle onboarding to solve cold start and personalise from day one
-- Rotation logic that deprioritises tops worn in the last 7 days
-- Feedback loop: thumbs up or down plus optional comment — rated outfits include specific item combinations so Claude learns at the combination level, not just occasion level
+- Wardrobe upload with Claude vision auto-tagging — two photos per item, AI identifies brand, colour, material, formality and style notes in seconds
+- Occasion-driven outfit recommendations — 8 preset occasions plus free text, always two looks with a plain-English reason for each
+- Weather context — four real conditions (warm, mild, cold, rainy) factored into every recommendation
+- Lifestyle onboarding — cold start solved by collecting weekly life context before the first recommendation
+- Rotation logic — tops worn in the last 6 days are deprioritised automatically. Marking an outfit as worn writes the date back to each item in real time
+- Feedback loop — thumbs up or down plus optional comment on every look. Rated outfits include specific item combinations so Claude learns at the combination level, not just occasion level
 - Wear logging with date stamps
-- Outfit history, browsable by month
-- Saved looks for outfits you want to revisit
-- Saved Looks tab — dedicated section to browse and revisit outfit looks you've saved
-- Post-onboarding wardrobe setup guide — new users are guided to build their wardrobe before getting recommendations
+- Outfit history — browsable by month with ratings and comments
+- Saved looks — dedicated tab to browse and revisit outfits you've bookmarked
+- Wardrobe search — filter instantly by colour, brand, item type or style notes
+- Photo lightbox — tap any clothing photo to see a full-screen view with brand, colour, formality and type overlaid
+- Full wardrobe management — edit tags, archive, restore, delete items with confirmation
+- Post-onboarding setup guide — new users are directed to build their wardrobe before getting recommendations
 - Specific error messaging — network, auth, and rate limit errors each surface distinct, actionable messages
-- Confirmation modal for destructive actions — permanent delete requires a modal with a cooldown to prevent accidental data loss
-- Unsaved changes warning in Settings — navigating away with unsaved lifestyle changes prompts a confirmation
-- Full wardrobe management: edit tags, archive, restore, and delete items
-- PWA: installable on your phone home screen, works without an app store
-- Wardrobe search — filter your wardrobe instantly by colour, brand, item type or style notes. Search and category filter work together.
-- Photo lightbox — tap any clothing photo in recommendations or saved looks to see a full-screen view with brand, colour, formality and item type overlaid.
-- Delete saved looks — remove looks from your saved collection with a two-tap confirmation.
-- Rotation now fully wired — when you mark an outfit as worn, last_worn_at is written back to each wardrobe item, activating the 6-day rotation window for tops.
+- PWA — installable on your phone home screen, works without an app store
 
 ---
 
