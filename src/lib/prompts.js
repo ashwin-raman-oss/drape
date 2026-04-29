@@ -34,7 +34,13 @@ export function buildRecommendationPrompt({ occasion, weather, lifestyleContext,
     .filter(i => i.status === 'active')
     .map(i => {
       const worn = recentlyWornIds.includes(i.id) ? ' [RECENTLY WORN — deprioritise]' : ''
-      return `ID:${i.id} | ${i.category} | ${i.item_type} | ${i.colour} | formality:${i.formality} | ${i.style_notes}${worn}`
+      const conditions = Array.isArray(i.condition_flags) && i.condition_flags.length > 0
+        ? ` | Conditions: ${i.condition_flags.join(', ')}`
+        : ''
+      const notes = i.personal_notes?.trim()
+        ? ` | Owner notes: ${i.personal_notes.trim()}`
+        : ''
+      return `ID:${i.id} | ${i.category} | ${i.item_type} | ${i.colour} | formality:${i.formality} | ${i.style_notes}${conditions}${notes}${worn}`
     })
     .join('\n')
 
@@ -68,6 +74,7 @@ ${itemsText}
 Rules:
 - Each look needs at least a Top, Bottom, and Shoes. Add Outer layer if weather warrants it.
 - Tops marked [RECENTLY WORN — deprioritise] have been worn in the last 6 days — do not include them in recommendations unless the wardrobe has no valid alternatives for the requested occasion.
+- Respect Conditions flags on items — 'Casual only' means never recommend for formal or office occasions, 'Cold weather only' means only recommend when weather is cold or rainy, 'Formal only' means only recommend for formal or smart occasions. Owner notes give personal context about how the user thinks about that item — use them to inform fit and occasion suitability.
 - Match formality to occasion. Respect weather.
 - Learn from the feedback history — avoid repeating specific item combinations that got 👎, and note which combinations and occasions earned 👍 to inform similar future requests.
 
