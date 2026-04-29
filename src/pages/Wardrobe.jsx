@@ -10,10 +10,24 @@ export default function Wardrobe() {
   const { data: items = [], isLoading } = useWardrobe()
   const [selected, setSelected] = useState(null)
   const [filter, setFilter] = useState('active')
+  const [search, setSearch] = useState('')
   const navigate = useNavigate()
 
-  const filtered = items.filter(i => i.status === filter)
   const activeCount = useMemo(() => items.filter(i => i.status === 'active').length, [items])
+
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase()
+    return items.filter(i => {
+      if (i.status !== filter) return false
+      if (!term) return true
+      return (
+        i.item_type?.toLowerCase().includes(term) ||
+        i.colour?.toLowerCase().includes(term) ||
+        i.brand?.toLowerCase().includes(term) ||
+        i.style_notes?.toLowerCase().includes(term)
+      )
+    })
+  }, [items, filter, search])
 
   return (
     <MobileLayout className="pb-nav">
@@ -31,6 +45,28 @@ export default function Wardrobe() {
         </button>
       </div>
 
+      {/* Search bar */}
+      <div className="px-6 mb-4 relative">
+        <input
+          type="search"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search by colour, brand or type…"
+          className="w-full bg-surface border border-border rounded-2xl px-4 py-3 pr-10 text-primary text-sm placeholder:text-muted focus:outline-none focus:border-accent"
+        />
+        {search && (
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => setSearch('')}
+            className="absolute right-9 top-1/2 -translate-y-1/2 text-muted text-sm leading-none"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* Category filter tabs */}
       <div className="flex px-6 mb-4 gap-3">
         {['active', 'archived'].map(f => (
           <button
@@ -49,6 +85,8 @@ export default function Wardrobe() {
       <div className="px-6">
         {isLoading ? (
           <div className="text-center py-16 text-muted text-sm">Loading...</div>
+        ) : filtered.length === 0 && search ? (
+          <p className="text-center py-16 text-muted text-sm">No items match "{search}"</p>
         ) : (
           <WardrobeGrid items={filtered} onItemClick={setSelected} />
         )}
