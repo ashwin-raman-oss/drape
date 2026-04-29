@@ -24,7 +24,7 @@ function DeleteModal({ itemName, onConfirm, onCancel, isDeleting }) {
             type="button"
             onClick={onConfirm}
             disabled={!cooldownDone || isDeleting}
-            className="w-full border border-red-900 text-red-400 py-4 rounded-2xl text-sm font-medium disabled:opacity-40 transition-opacity"
+            className="w-full border border-error text-error py-4 rounded-2xl text-sm font-medium disabled:opacity-40 transition-opacity"
           >
             {isDeleting ? 'Deleting...' : cooldownDone ? 'Yes, delete permanently' : 'Hold on…'}
           </button>
@@ -145,7 +145,7 @@ export default function ItemDetail({ item, onClose }) {
               )}
               {item.personal_notes && <p className="text-xs text-muted italic mb-6">{item.personal_notes}</p>}
 
-              {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
+              {error && <p className="text-error text-sm text-center mb-4">{error}</p>}
 
               <div className="space-y-3">
                 <button
@@ -169,7 +169,7 @@ export default function ItemDetail({ item, onClose }) {
                   ref={deleteRef}
                   type="button"
                   onClick={() => setShowDeleteModal(true)}
-                  className="w-full border border-red-900 text-red-400 py-4 rounded-2xl text-sm"
+                  className="w-full border border-error text-error py-4 rounded-2xl text-sm"
                 >
                   Permanently delete
                 </button>

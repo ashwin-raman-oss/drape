@@ -158,7 +158,7 @@ export default function ItemEditForm({ item, onDone }) {
         </div>
       </div>
 
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+      {error && <p className="text-error text-sm text-center">{error}</p>}
 
       <button
         type="button"
