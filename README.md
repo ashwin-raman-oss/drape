@@ -51,6 +51,9 @@ A recommendation engine with no data is useless. Rather than launching to an emp
 **Rotation logic on tops only, 7-day window**
 Tops are the most visible and most memorable piece of any outfit. Trousers and shoes can repeat without anyone noticing. Tracking recency on tops within a rolling 7-day window prevents visible repetition without being so restrictive it limits valid options.
 
+**Specific errors over generic ones**
+Every failure mode in the recommendation flow surfaces a distinct, actionable message. Generic errors erode trust; specific ones give users something to act on.
+
 ---
 
 ## How It Works
@@ -76,6 +79,11 @@ When you request an outfit, the app assembles a context payload: your occasion a
 - Wear logging with date stamps
 - Outfit history, browsable by month
 - Saved looks for outfits you want to revisit
+- Saved Looks tab — dedicated section to browse and revisit outfit looks you've saved
+- Post-onboarding wardrobe setup guide — new users are guided to build their wardrobe before getting recommendations
+- Specific error messaging — network, auth, and rate limit errors each surface distinct, actionable messages
+- Confirmation modal for destructive actions — permanent delete requires a modal with a cooldown to prevent accidental data loss
+- Unsaved changes warning in Settings — navigating away with unsaved lifestyle changes prompts a confirmation
 - Full wardrobe management: edit tags, archive, restore, and delete items
 - PWA: installable on your phone home screen, works without an app store
 
@@ -141,6 +149,9 @@ Run the following in the Supabase SQL Editor, in order:
 
 These are the post-MVP features worth building next, in rough priority order.
 
+**Feedback loop nudges**
+A proactive prompt to return and rate an outfit after wearing it, closing the loop that makes recommendations improve over time.
+
 **Partner / share mode**
 Send a look to someone for a second opinion before you commit to it. Useful for anyone who wants a sanity check on a big meeting outfit or a first date.
 
@@ -160,4 +171,4 @@ A separate wardrobe section and occasion set for gym, running, and active use. D
 
 ## About
 
-Built by Ashwin Raman, a Group Product Manager with 9 years of experience across consumer and enterprise products. Drape is a portfolio project built to demonstrate end-to-end AI product thinking: from problem definition and design rationale through technical architecture and production deployment. It is not a prototype. It is actively used daily as a personal tool.
+Built by Ashwin Raman, a Group Product Manager with 9 years of experience across consumer and enterprise products. Drape is a portfolio project built to demonstrate end-to-end AI product thinking: from problem definition and design rationale through technical architecture and production deployment. It is not a prototype. It is actively used and iterated daily as a personal tool.
