@@ -20,7 +20,7 @@ Example output (do not copy these values — analyse the actual images):
 }
 
 // Builds the Claude prompt for outfit recommendations
-export function buildRecommendationPrompt({ occasion, weather, lifestyleContext, wardrobeItems, recentRatings, wardrobeMap }) {
+export function buildRecommendationPrompt({ occasion, weather, lifestyleContext, wardrobeItems, recentRatings, recentReactions = [], wardrobeMap }) {
   const recentlyWornIds = wardrobeItems
     .filter(item => {
       if (item.category !== 'Top') return false
@@ -59,6 +59,22 @@ export function buildRecommendationPrompt({ occasion, weather, lifestyleContext,
       }).join('\n\n')
     : 'No ratings yet.'
 
+  const reactionsText = recentReactions.length
+    ? recentReactions.map(r => {
+        const reactionEmoji = r.reaction === 'thumbs_up' ? '👍' : '👎'
+        const itemNames = (r.item_ids ?? [])
+          .map(id => wardrobeMap?.get(id))
+          .filter(Boolean)
+          .map(item => `${item.colour} ${item.item_type}`)
+          .join(', ')
+        const lines = [`Occasion: ${r.occasion}, Weather: ${r.weather}, Reaction: ${reactionEmoji}`]
+        if (itemNames) lines.push(`Items: ${itemNames}`)
+        if (r.reaction === 'thumbs_down' && r.reaction_items?.length) lines.push(`Flagged: ${r.reaction_items.join(', ')}`)
+        if (r.reaction_comment) lines.push(`Comment: ${r.reaction_comment}`)
+        return lines.join('\n')
+      }).join('\n\n')
+    : ''
+
   return `You are a personal stylist AI. Recommend exactly 2 complete outfit looks from the wardrobe below.
 
 OCCASION: ${occasion}
@@ -67,7 +83,12 @@ USER LIFESTYLE CONTEXT: ${lifestyleContext.join(', ')}
 
 RECENT OUTFIT FEEDBACK (last 10):
 ${ratingsText}
+${reactionsText ? `
+PRE-WEAR REACTIONS (combination-level signal — individual items are not penalised):
+${reactionsText}
 
+Pre-wear reactions reflect immediate style opinions, not wear experience. A 👎 means this specific combination didn't feel right for this context — the individual items remain strong candidates in other pairings. A 👍 confirms the combination looked right before wearing.
+` : ''}
 AVAILABLE WARDROBE ITEMS:
 ${itemsText}
 
@@ -92,4 +113,61 @@ Return ONLY a valid JSON array with exactly 2 objects:
   }
 ]
 Do not include any text outside the JSON array.`
+}
+
+// Builds the Claude prompt for a single replacement outfit after a thumbs-down reaction
+export function buildReplacementPrompt({ occasion, weather, lifestyleContext, wardrobeItems, wardrobeMap, downvotedLook, flaggedItems = [] }) {
+  const recentlyWornIds = wardrobeItems
+    .filter(item => {
+      if (item.category !== 'Top') return false
+      if (!item.last_worn_at) return false
+      const daysSince = (Date.now() - new Date(item.last_worn_at)) / 86400000
+      return daysSince < 7
+    })
+    .map(i => i.id)
+
+  const itemsText = wardrobeItems
+    .filter(i => i.status === 'active')
+    .map(i => {
+      const worn = recentlyWornIds.includes(i.id) ? ' [RECENTLY WORN — deprioritise]' : ''
+      const conditions = Array.isArray(i.condition_flags) && i.condition_flags.length > 0
+        ? ` | Conditions: ${i.condition_flags.join(', ')}`
+        : ''
+      const notes = i.personal_notes?.trim() ? ` | Owner notes: ${i.personal_notes.trim()}` : ''
+      return `ID:${i.id} | ${i.category} | ${i.item_type} | ${i.colour} | formality:${i.formality} | ${i.style_notes}${conditions}${notes}${worn}`
+    })
+    .join('\n')
+
+  const rejectedItems = (downvotedLook.item_ids ?? [])
+    .map(id => wardrobeMap?.get(id))
+    .filter(Boolean)
+    .map(item => `${item.colour} ${item.item_type}`)
+    .join(', ')
+
+  return `You are a personal stylist AI. Generate exactly ONE alternative outfit for the occasion below.
+
+OCCASION: ${occasion}
+WEATHER: ${weather}
+USER LIFESTYLE CONTEXT: ${lifestyleContext.join(', ')}
+
+REJECTED LOOK — DO NOT REPEAT:
+Items: ${rejectedItems}
+Flagged categories: ${flaggedItems.join(', ') || 'none specified'}
+Instruction: Generate exactly ONE alternative complete outfit. Do not use the same combination of items as the rejected look. The individual items are not banned — they may appear in different pairings. The flagged categories indicate which part of the outfit didn't work — pay special attention to choosing a better option for those categories.
+
+AVAILABLE WARDROBE ITEMS:
+${itemsText}
+
+Rules:
+- Each look needs at least a Top, Bottom, and Shoes. Add Outer layer if weather warrants it.
+- Tops marked [RECENTLY WORN — deprioritise] have been worn in the last 6 days — avoid unless no alternatives.
+- Match formality to occasion. Respect weather.
+
+Return ONLY a valid JSON object:
+{
+  "look_number": 1,
+  "item_ids": ["uuid1", "uuid2", "uuid3"],
+  "reason": "one sentence explaining why this outfit works"
+}
+Do not include any text outside the JSON object.`
 }

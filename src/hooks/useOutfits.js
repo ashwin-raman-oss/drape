@@ -115,6 +115,52 @@ export function useDeleteSavedLook() {
   })
 }
 
+export function useAddReaction() {
+  const { session } = useAuth()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ occasion, weather, itemIds, reaction, reactionItems = [], reactionComment = '' }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
+      const { data, error } = await supabase
+        .from('outfit_logs')
+        .insert({
+          user_id: session.user.id,
+          occasion,
+          weather,
+          item_ids: itemIds,
+          reaction,
+          reaction_items: reactionItems,
+          reaction_comment: reactionComment,
+        })
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['outfit_logs', data?.user_id ?? session?.user?.id] }),
+  })
+}
+
+export function useUpdateReaction() {
+  const { session } = useAuth()
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, reactionItems, reactionComment }) => {
+      if (!session?.user?.id) throw new Error('Not authenticated')
+      const { data, error } = await supabase
+        .from('outfit_logs')
+        .update({ reaction_items: reactionItems, reaction_comment: reactionComment })
+        .eq('id', id)
+        .eq('user_id', session.user.id)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: (data) => qc.invalidateQueries({ queryKey: ['outfit_logs', data?.user_id ?? session?.user?.id] }),
+  })
+}
+
 export function useDeleteOutfitLog() {
   const { session } = useAuth()
   const qc = useQueryClient()

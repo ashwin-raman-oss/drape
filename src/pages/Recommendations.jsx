@@ -9,7 +9,7 @@ import { useOutfitLogs, useSaveLook, useAddOutfitLog } from '../hooks/useOutfits
 import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
 import { callClaude, extractJSON } from '../lib/claude'
-import { buildRecommendationPrompt } from '../lib/prompts'
+import { buildRecommendationPrompt, buildReplacementPrompt } from '../lib/prompts'
 
 function classifyError(e) {
   const msg = e?.message ?? ''
@@ -40,11 +40,21 @@ export default function Recommendations() {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [looks, setLooks] = useState(null)
   const [savedLooks, setSavedLooks] = useState({})
   const [savingLook, setSavingLook] = useState(null)
   const [saveError, setSaveError] = useState(null)
 
   const activeItems = wardrobe.filter(i => i.status === 'active')
+
+  const wardrobeById = useMemo(() => new Map(wardrobe.map(item => [item.id, item])), [wardrobe])
+
+  // Sync local looks state from store (initial load only)
+  useEffect(() => {
+    if (recommendations?.looks && !looks) {
+      setLooks(recommendations.looks)
+    }
+  }, [recommendations, looks])
 
   const fetchRecommendations = useCallback(async () => {
     if (activeItems.length < 3) return
@@ -55,12 +65,17 @@ export default function Recommendations() {
         .filter(l => l.rating !== null)
         .slice(0, 10)
 
+      const recentReactions = outfitLogs
+        .filter(l => l.reaction !== null)
+        .slice(0, 10)
+
       const prompt = buildRecommendationPrompt({
         occasion,
         weather,
         lifestyleContext: profile?.lifestyle_context ?? [],
         wardrobeItems: wardrobe,
         recentRatings,
+        recentReactions,
         wardrobeMap: wardrobeById,
       })
 
@@ -72,12 +87,13 @@ export default function Recommendations() {
 
       const json = extractJSON(response)
       setRecommendations({ looks: json })
+      setLooks(json)
     } catch (e) {
       setError(classifyError(e))
     } finally {
       setLoading(false)
     }
-  }, [occasion, weather, wardrobe, outfitLogs, profile, activeItems.length, setRecommendations])
+  }, [occasion, weather, wardrobe, outfitLogs, profile, activeItems.length, setRecommendations, wardrobeById])
 
   useEffect(() => {
     if (!occasion || !weather) {
@@ -88,6 +104,34 @@ export default function Recommendations() {
       fetchRecommendations()
     }
   }, [occasion, weather, recommendations, wardrobeReady, logsReady, profileReady, fetchRecommendations, navigate])
+
+  async function fetchReplacement(downvotedLook, flaggedItems) {
+    const prompt = buildReplacementPrompt({
+      occasion,
+      weather,
+      lifestyleContext: profile?.lifestyle_context ?? [],
+      wardrobeItems: wardrobe,
+      wardrobeMap: wardrobeById,
+      downvotedLook,
+      flaggedItems,
+    })
+
+    const response = await callClaude({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 512,
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const json = extractJSON(response)
+    const newLook = Array.isArray(json) ? json[0] : json
+    setLooks(prev =>
+      (prev ?? []).map(l =>
+        l.look_number === downvotedLook.look_number
+          ? { ...newLook, look_number: downvotedLook.look_number }
+          : l
+      )
+    )
+  }
 
   async function handleSaveLook(look) {
     setSavingLook(look.look_number)
@@ -104,8 +148,6 @@ export default function Recommendations() {
       setSavingLook(null)
     }
   }
-
-  const wardrobeById = useMemo(() => new Map(wardrobe.map(item => [item.id, item])), [wardrobe])
 
   function getLookItems(itemIds) {
     return itemIds.map(id => wardrobeById.get(id)).filter(Boolean)
@@ -155,15 +197,19 @@ export default function Recommendations() {
           <p className="text-sm text-center text-red-400">{saveError}</p>
         )}
 
-        {!loading && !error && !showEmptyState && recommendations?.looks?.map(look => (
+        {!loading && !error && !showEmptyState && looks?.map(look => (
           <OutfitLook
             key={look.look_number}
             lookNumber={look.look_number}
             items={getLookItems(look.item_ids)}
             reason={look.reason}
+            look={look}
+            occasion={occasion}
+            weather={weather}
             onSave={() => handleSaveLook(look)}
             isSaving={savingLook === look.look_number}
             isSaved={!!savedLooks[look.look_number]}
+            onFetchReplacement={fetchReplacement}
           />
         ))}
       </div>

@@ -12,6 +12,8 @@ import WardrobeIntro from './pages/WardrobeIntro'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Saved from './pages/Saved'
+import OutdoorCheck from './pages/OutdoorCheck'
+import AmbiguousCheck from './pages/AmbiguousCheck'
 
 export default function App() {
   const { session, loading: authLoading } = useAuth()
@@ -60,6 +62,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/weather" element={<Weather />} />
+      <Route path="/outdoor-check" element={<OutdoorCheck />} />
+      <Route path="/ambiguous-check" element={<AmbiguousCheck />} />
       <Route path="/recommendations" element={<Recommendations />} />
       <Route path="/wardrobe" element={<Wardrobe />} />
       <Route path="/upload" element={<Upload />} />

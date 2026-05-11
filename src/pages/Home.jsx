@@ -1,28 +1,39 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MobileLayout from '../components/layout/MobileLayout'
 import BottomNav from '../components/layout/BottomNav'
 import OccasionGrid from '../components/home/OccasionGrid'
 import { useFlowStore } from '../store/flowStore'
+import { classifyOccasion } from '../lib/claude'
 
 export default function Home() {
   const setOccasion = useFlowStore(s => s.setOccasion)
   const resetFlow = useFlowStore(s => s.resetFlow)
   const [text, setText] = useState('')
+  const [isClassifying, setIsClassifying] = useState(false)
   const navigate = useNavigate()
+  const textareaRef = useRef(null)
 
-  // Clear any stale flow state from a previous session
   useEffect(() => { resetFlow() }, [])
+  useEffect(() => { textareaRef.current?.focus() }, [])
 
   function handlePreset(label) {
-    setText(label)
+    setText(prev => {
+      const trimmed = prev.trim()
+      return trimmed ? `${trimmed}, ${label}` : label
+    })
   }
 
-  function handleContinue() {
+  async function handleContinue() {
     const trimmed = text.trim()
-    if (!trimmed) return
+    if (!trimmed || isClassifying) return
     setOccasion(trimmed)
-    navigate('/weather')
+    setIsClassifying(true)
+    const venueType = await classifyOccasion(trimmed)
+    setIsClassifying(false)
+    if (venueType === 'outdoor') navigate('/weather')
+    else if (venueType === 'indoor') navigate('/outdoor-check')
+    else navigate('/ambiguous-check')
   }
 
   return (
@@ -33,21 +44,22 @@ export default function Home() {
         <h1 className="font-serif text-3xl font-light leading-tight text-primary">What's the occasion?</h1>
       </div>
 
-      {/* Preset grid */}
-      <div className="px-6 mb-6">
-        <OccasionGrid onSelect={handlePreset} selected={text} />
-      </div>
-
-      {/* Free text input */}
+      {/* Primary textarea */}
       <div className="px-6">
         <textarea
+          ref={textareaRef}
           value={text}
           onChange={e => setText(e.target.value)}
-          placeholder="Or describe it yourself..."
-          rows={2}
-          className="w-full bg-transparent border-0 border-b border-border px-0 py-4 text-base font-light text-primary placeholder:text-muted resize-none focus:outline-none focus:border-accent transition-colors"
+          placeholder="Describe your day — where are you going, what's the vibe?"
+          className="w-full bg-transparent border-0 border-b border-border px-0 py-4 text-base font-light text-primary placeholder:text-muted resize-none focus:outline-none focus:border-accent transition-colors min-h-[120px]"
           aria-label="Occasion description"
         />
+      </div>
+
+      {/* Quick picks */}
+      <p className="px-6 text-xs tracking-widest uppercase text-muted mt-6 mb-3">Quick picks</p>
+      <div className="px-6">
+        <OccasionGrid onSelect={handlePreset} />
       </div>
 
       <div className="flex-1" />
@@ -57,10 +69,10 @@ export default function Home() {
         <button
           type="button"
           onClick={handleContinue}
-          disabled={!text.trim()}
+          disabled={!text.trim() || isClassifying}
           className="w-full bg-accent text-bg py-4 rounded-2xl text-sm font-medium tracking-widest uppercase disabled:opacity-40"
         >
-          Next
+          {isClassifying ? 'Thinking...' : 'Next'}
         </button>
       </div>
 
