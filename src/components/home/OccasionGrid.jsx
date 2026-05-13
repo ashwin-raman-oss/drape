@@ -13,7 +13,7 @@ const PRESETS = [
 
 export default function OccasionGrid({ onSelect }) {
   return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+    <div className="flex flex-wrap gap-2">
       {PRESETS.map(p => (
         <PresetTile
           key={p.label}
