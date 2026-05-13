@@ -41,6 +41,7 @@ export default function Recommendations() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [looks, setLooks] = useState(null)
+  const [lookVersions, setLookVersions] = useState({})
   const [savedLooks, setSavedLooks] = useState({})
   const [savingLook, setSavingLook] = useState(null)
   const [saveError, setSaveError] = useState(null)
@@ -131,6 +132,10 @@ export default function Recommendations() {
           : l
       )
     )
+    setLookVersions(prev => ({
+      ...prev,
+      [downvotedLook.look_number]: (prev[downvotedLook.look_number] ?? 0) + 1,
+    }))
   }
 
   async function handleSaveLook(look) {
@@ -199,7 +204,7 @@ export default function Recommendations() {
 
         {!loading && !error && !showEmptyState && looks?.map(look => (
           <OutfitLook
-            key={look.look_number}
+            key={`${look.look_number}-${lookVersions[look.look_number] ?? 0}`}
             lookNumber={look.look_number}
             items={getLookItems(look.item_ids)}
             reason={look.reason}
